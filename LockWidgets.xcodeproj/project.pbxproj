@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		007B769D2FD82A244D199DDB /* LicensePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9AAAA360547CF8D413C11A2 /* LicensePage.swift */; };
 		072FDD1EE9F246E5C7BCEC61 /* LyricsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB0DD8D79FA0BF7238001897 /* LyricsStore.swift */; };
 		07AE050F531B1D09BB61F393 /* CalendarStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB6AF92AA3C096A2C102584A /* CalendarStore.swift */; };
 		08C0B975DB0E728ED761039E /* WidgetCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3D4B280E0A6F0FAAECBA14B /* WidgetCard.swift */; };
@@ -25,6 +26,7 @@
 		348F1C0CC203B72102C2B973 /* NotificationIsland.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC24D3D942A21659A1C96E66 /* NotificationIsland.swift */; };
 		37BF9D2007A3BD1E1C46B18D /* DailyBriefWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BFDEB25E245827A7F447F5B /* DailyBriefWidget.swift */; };
 		39E518C35F86EC2D472747C0 /* OverlayManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E99FB43B933F43756700684B /* OverlayManager.swift */; };
+		41A12F3F862D9FEE8A26AAB3 /* LicenseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7C6BDC2A9C99596CFCFE3F /* LicenseStore.swift */; };
 		4469748AF58F07A1B94D7510 /* WeatherStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AEAFD45F48CEC57D83E9622 /* WeatherStore.swift */; };
 		478DAABE02E9E7F2B9A6E8A5 /* WidgetPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842E3889C5A24B2CAA914CBF /* WidgetPicker.swift */; };
 		498525240AF04CC22C138ECB /* StickyNoteWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5542B4EFD93B4AB2028DCB89 /* StickyNoteWidget.swift */; };
@@ -98,6 +100,7 @@
 		340B9D05531D1298D3305788 /* LayoutStudioPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutStudioPage.swift; sourceTree = "<group>"; };
 		35143FB7F7104D48A9C5CCC9 /* MusicCardWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicCardWidget.swift; sourceTree = "<group>"; };
 		3A520B6BC02944014CAB7788 /* SettingsWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindow.swift; sourceTree = "<group>"; };
+		3C7C6BDC2A9C99596CFCFE3F /* LicenseStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseStore.swift; sourceTree = "<group>"; };
 		3DCE04B03437C9A51DC657C6 /* Updater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Updater.swift; sourceTree = "<group>"; };
 		3F494EDCBD251C16B86A4343 /* SystemMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemMonitor.swift; sourceTree = "<group>"; };
 		406E0CD205C3061CF6EFE586 /* EarthStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EarthStore.swift; sourceTree = "<group>"; };
@@ -139,6 +142,7 @@
 		C166765275AD20B49E4DCDBE /* WeatherWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherWidget.swift; sourceTree = "<group>"; };
 		C6C4166E066E91470CCA71C3 /* RemindersStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersStore.swift; sourceTree = "<group>"; };
 		C7E9C717EC3548B411BFD11C /* LayoutGalleryPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutGalleryPage.swift; sourceTree = "<group>"; };
+		C9AAAA360547CF8D413C11A2 /* LicensePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicensePage.swift; sourceTree = "<group>"; };
 		CA558E33214FD867D2DF7B02 /* LocationWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationWidget.swift; sourceTree = "<group>"; };
 		CA65EB68D63BB068EC166544 /* DeviceMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceMonitor.swift; sourceTree = "<group>"; };
 		CB910C73FBFB4C186BF67F02 /* TripStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripStore.swift; sourceTree = "<group>"; };
@@ -246,6 +250,7 @@
 				BB6AF92AA3C096A2C102584A /* CalendarStore.swift */,
 				CA65EB68D63BB068EC166544 /* DeviceMonitor.swift */,
 				406E0CD205C3061CF6EFE586 /* EarthStore.swift */,
+				3C7C6BDC2A9C99596CFCFE3F /* LicenseStore.swift */,
 				EB0DD8D79FA0BF7238001897 /* LyricsStore.swift */,
 				51BC3ABA91FF75E22A9622A7 /* NewsStore.swift */,
 				C1232187C31444AB12322EDB /* NotificationStore.swift */,
@@ -306,6 +311,7 @@
 				45227B1790D28DA62C5833A6 /* IslandSettingsPage.swift */,
 				C7E9C717EC3548B411BFD11C /* LayoutGalleryPage.swift */,
 				340B9D05531D1298D3305788 /* LayoutStudioPage.swift */,
+				C9AAAA360547CF8D413C11A2 /* LicensePage.swift */,
 				8314A5D52CFB7C8C3DC10023 /* SettingsKeys.swift */,
 				3A520B6BC02944014CAB7788 /* SettingsWindow.swift */,
 				E1A65F02971426C626E09C01 /* SetupGuide.swift */,
@@ -420,6 +426,8 @@
 				8EE9ADA9CB9906AF5DEE5112 /* LayoutGalleryPage.swift in Sources */,
 				C2C478E31A770DC83E86961D /* LayoutStore.swift in Sources */,
 				52690D0AE034DEDF3E3D8D2E /* LayoutStudioPage.swift in Sources */,
+				007B769D2FD82A244D199DDB /* LicensePage.swift in Sources */,
+				41A12F3F862D9FEE8A26AAB3 /* LicenseStore.swift in Sources */,
 				7D0EA2DAADFCC5EF81F6BBC9 /* LocationWidget.swift in Sources */,
 				F8E78ABA08C2E9397CD0F450 /* LockWidgetsApp.swift in Sources */,
 				072FDD1EE9F246E5C7BCEC61 /* LyricsStore.swift in Sources */,

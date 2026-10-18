@@ -100,9 +100,11 @@ private struct MenuBarLabel: View {
                     return
                 }
                 #endif
+                // When the free trial has ended, settings open on the Licence page.
+                if LicenseStore.shared.state == .expired { SettingsRouter.shared.page = .licence }
                 if !hasLaunched {
                     openWindow(id: "setup")
-                } else if !AppDelegate.launchedAtLogin {
+                } else if !AppDelegate.launchedAtLogin || LicenseStore.shared.state == .expired {
                     openWindow(id: "settings")
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { DockPolicy.bringWindowsForward() }
@@ -173,6 +175,7 @@ private struct MenuContent: View {
     @ObservedObject private var timers = TimerStore.shared
     @ObservedObject private var updater = Updater.shared
     @ObservedObject private var trips = TripStore.shared
+    @ObservedObject private var licence = LicenseStore.shared
     @Environment(\.openWindow) private var openWindow
     @AppStorage(SettingsKey.showOnLockScreen) private var showOnLockScreen = true
     @AppStorage(SettingsKey.islandEnabled) private var islandEnabled = true
@@ -190,6 +193,17 @@ private struct MenuContent: View {
         Text("Notchlight \(version)")
         if let available = updater.availableVersion {
             Button("Update to Notchlight \(available)…") { updater.checkForUpdates() }
+        }
+        switch licence.state {
+        case let .trial(daysLeft):
+            Button("Free Trial, \(daysLeft == 1 ? "1 Day" : "\(daysLeft) Days") Left · Buy Notchlight…") {
+                NSWorkspace.shared.open(LicenseStore.checkoutURL)
+            }
+        case .expired:
+            Button("Trial Ended · Buy Notchlight…") { NSWorkspace.shared.open(LicenseStore.checkoutURL) }
+            Button("Enter Licence Key…") { open(.licence) }
+        case .licensed:
+            EmptyView()
         }
 
         Divider()

@@ -19,8 +19,9 @@ final class IslandController {
 
     private enum PressTarget { case island, bubble }
 
+    /// On when the setting is, and while the trial lasts or Notchlight is licensed.
     private var enabled: Bool {
-        UserDefaults.standard.object(forKey: SettingsKey.islandEnabled) as? Bool ?? true
+        (UserDefaults.standard.object(forKey: SettingsKey.islandEnabled) as? Bool ?? true) && LicenseStore.shared.isActive
     }
 
     func start() {
@@ -35,6 +36,10 @@ final class IslandController {
             self?.update()
         }
         NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.update() }
+            .store(in: &subscriptions)
+        LicenseStore.shared.$state
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in self?.update() }
             .store(in: &subscriptions)

@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum SettingsPage: Hashable {
-    case general, whatsNew, layoutStudio, gallery, appearance, stickyNotes, island, about
+    case general, whatsNew, licence, layoutStudio, gallery, appearance, stickyNotes, island, about
     case widget(WidgetKind)
 
     #if DEBUG
@@ -9,7 +9,7 @@ enum SettingsPage: Hashable {
     static var launchPage: SettingsPage? {
         guard let name = UserDefaults.standard.string(forKey: "settingsPage") else { return nil }
         if let kind = WidgetKind(rawValue: name) { return .widget(kind) }
-        return ["general": .general, "whatsnew": .whatsNew, "studio": .layoutStudio, "gallery": .gallery, "appearance": .appearance, "notes": .stickyNotes, "island": .island, "about": .about][name]
+        return ["general": .general, "whatsnew": .whatsNew, "licence": .licence, "studio": .layoutStudio, "gallery": .gallery, "appearance": .appearance, "notes": .stickyNotes, "island": .island, "about": .about][name]
     }
     #endif
 }
@@ -31,6 +31,8 @@ struct SettingsWindow: View {
                     .tag(SettingsPage.general)
                 SidebarRow(title: "What's New", symbol: "sparkles", color: .pink)
                     .tag(SettingsPage.whatsNew)
+                SidebarRow(title: "Licence", symbol: "key.fill", color: .orange)
+                    .tag(SettingsPage.licence)
 
                 Section("Lock Screen") {
                     SidebarRow(title: "Layout Studio", symbol: "rectangle.3.group.fill", color: .blue)
@@ -65,6 +67,7 @@ struct SettingsWindow: View {
             switch router.page ?? .general {
             case .general: GeneralPage(overlay: overlay)
             case .whatsNew: WhatsNewPage()
+            case .licence: LicensePage()
             case .layoutStudio: LayoutStudioPage()
             case .gallery: LayoutGalleryPage()
             case .appearance: AppearancePage()
