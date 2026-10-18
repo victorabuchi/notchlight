@@ -39,6 +39,7 @@
   --accent: #0066cc;
   --button: #0071e3;
   --on-button: #ffffff;
+  --button-hover: #0077ed;
   --select: rgba(0, 113, 227, 0.4);
   --tile: #f5f5f7;
   --new: #b64400;
@@ -202,6 +203,11 @@ p { margin: 0; }
 .search-button:hover, .search-button[aria-expanded="true"] { color: var(--ink); background: var(--hover); }
 .bar-download { flex: none; margin-left: 12px; font-size: 14px; letter-spacing: -0.01em; color: var(--ink); text-decoration: none; white-space: nowrap; }
 .bar-download:hover { color: var(--accent); }
+/* Buy, as on Apple's pages: a blue pill, small in the top bar. */
+.buy { display: inline-flex; align-items: center; justify-content: center; border-radius: 980px; background: var(--button); color: var(--on-button); font-size: 17px; letter-spacing: -0.01em; padding: 8px 18px; text-decoration: none; white-space: nowrap; }
+.buy:hover { background: var(--button-hover); }
+.bar-buy { flex: none; margin-left: 14px; font-size: 12px; padding: 4px 11px; }
+.get { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 14px 28px; }
 
 /* Search: a panel under the top bar that finds sections, widgets, island activities, layouts and answers. */
 .search { position: fixed; inset: 0; z-index: 100; display: none; }
@@ -232,7 +238,7 @@ p { margin: 0; }
 .hero h1 { font-size: clamp(44px, 6.2vw, 76px); font-weight: 700; letter-spacing: -0.025em; }
 .hero-icon { width: 120px; height: 120px; margin-bottom: -4px; }
 .hero .lede { margin-inline: auto; }
-.hero .download { font-size: 21px; margin-top: 2px; }
+.hero .get { margin-top: 2px; }
 .brew { display: flex; align-items: center; gap: 12px; max-width: 100%; min-width: 0; }
 .brew code { font-family: var(--mono); font-size: 14px; color: var(--ink); overflow-x: auto; white-space: nowrap; min-width: 0; scrollbar-width: none; }
 .copy { border: 0; border-radius: 999px; padding: 7px 14px; background: var(--paper-2); color: var(--ink); font: 600 14px var(--body); cursor: pointer; }
@@ -629,10 +635,11 @@ footer .legal { flex-basis: 100%; font-size: 13px; }
 @media (max-width: 900px) {
   .showcase { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .stages { grid-column: 1 / -1; order: -1; position: static; }
-  .topbar { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; }
+  .topbar { display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto; }
   .brand { grid-row: 1; padding-top: 10px; }
   .search-button { grid-row: 1; grid-column: 2; margin-top: 10px; }
   .bar-download { grid-row: 1; grid-column: 3; margin-top: 10px; }
+  .bar-buy { grid-row: 1; grid-column: 4; margin-top: 10px; }
   .nav { grid-row: 2; grid-column: 1 / -1; margin: 0; padding: 12px 0 13px; gap: 20px; overflow-x: auto; scrollbar-width: none; }
   .nav::-webkit-scrollbar { display: none; }
 }
@@ -681,6 +688,7 @@ footer .legal { flex-basis: 100%; font-size: 13px; }
       <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="6.5" cy="6.5" r="4.75" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10 10l4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
     </button>
     <a class="bar-download" href="https://github.com/victorabuchi/notchlight/releases/latest/download/Notchlight.dmg">Download</a>
+    <a class="buy bar-buy" href="https://buy.polar.sh/polar_cl_3kwCipamOJFV6MggVZJUPtsrjRJcMMvz8Tsok1mVmVn" data-buy>Buy</a>
   </nav>
 </header>
 
@@ -690,8 +698,12 @@ footer .legal { flex-basis: 100%; font-size: 13px; }
       <span class="app-icon hero-icon" aria-hidden="true"></span>
       <h1>Notchlight</h1>
       <p class="lede">Notchlight puts live widgets on your Mac's lock screen and turns the notch into a Dynamic Island: the song that's playing with Apple Music's own lyrics, your calls, notifications and more.</p>
-      <a class="download" href="https://github.com/victorabuchi/notchlight/releases/latest/download/Notchlight.dmg">Download <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.6" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10 5.8v7.6M6.7 10.4 10 13.7l3.3-3.3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <div class="get">
+        <a class="buy" href="https://buy.polar.sh/polar_cl_3kwCipamOJFV6MggVZJUPtsrjRJcMMvz8Tsok1mVmVn" data-buy>Buy for $14.99</a>
+        <a class="download" href="https://github.com/victorabuchi/notchlight/releases/latest/download/Notchlight.dmg">Try it free <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.6" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10 5.8v7.6M6.7 10.4 10 13.7l3.3-3.3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
       <div class="facts">
+        <span>7-day free trial</span>
         <span>macOS 15 or later</span>
         <span>Signed and notarized by Apple</span>
         <span>No account</span>
@@ -1379,6 +1391,8 @@ footer .legal { flex-basis: 100%; font-size: 13px; }
         <details id="faq-1"><summary>Why isn't it on the Mac App Store?</summary><p>Mac App Store apps run in Apple's sandbox, which doesn't allow drawing over the lock screen or reading notifications. Notchlight is signed with a Developer ID and notarized by Apple instead, so it installs and opens like any other app.</p></details>
         <details id="faq-2"><summary>Is it safe?</summary><p>Apple scans every release for malware before notarizing it, and updates are signed so your Mac only installs ones that come from Notchlight. The source code is on GitHub.</p></details>
         <details id="faq-3"><summary>Which Macs does it work on?</summary><p>Any Mac with macOS 15 or later. The Dynamic Island is made for MacBooks with a notch; on other Macs it shows up only while something is live.</p></details>
+        <details id="faq-price"><summary>How much does it cost?</summary><p>$14.99, paid once. It isn't a subscription, and one licence works on up to 3 of your Macs. Try everything free for 7 days first.</p></details>
+        <details id="faq-key"><summary>Where's my licence key?</summary><p>On the page after you pay, and in your receipt email. In Notchlight, open Settings, choose Licence and paste it. To move it to another Mac, deactivate it there or in <a href="https://polar.sh/notchlight/portal">Polar's customer portal</a>.</p></details>
         <details id="faq-homebrew"><summary>Can I install it with Homebrew?</summary><p>Yes. Paste this into Terminal:</p><div class="brew"><code id="brew-faq">brew install --cask victorabuchi/tap/notchlight</code><button class="copy" type="button" data-copy="brew-faq">Copy</button></div></details>
         <details id="faq-4"><summary>Does it work with Spotify?</summary><p>Yes: the song playing in Spotify shows in the island and on the lock screen, with its artwork and controls. Synced lyrics come from Apple Music only.</p></details>
         <details id="faq-5"><summary>What permissions does it ask for?</summary><p>Only what your widgets use: Calendar, Reminders, Location for weather, Photos, and Automation to read the song in Music or Spotify. Notifications on the island need Full Disk Access, because macOS keeps them in a protected file. The Setup Guide takes you to each one.</p></details>
@@ -1391,11 +1405,14 @@ footer .legal { flex-basis: 100%; font-size: 13px; }
   <section class="closing" id="download">
     <div class="wrap">
       <div class="download-card">
-        <h2>Download Notchlight</h2>
+        <h2>Get Notchlight</h2>
         <span class="app-icon" aria-hidden="true"></span>
         <div class="download-go">
-          <a class="download" href="https://github.com/victorabuchi/notchlight/releases/latest/download/Notchlight.dmg">Download <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.6" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10 5.8v7.6M6.7 10.4 10 13.7l3.3-3.3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-          <p class="requires">Requires macOS Sequoia or later.</p>
+          <div class="get">
+            <a class="buy" href="https://buy.polar.sh/polar_cl_3kwCipamOJFV6MggVZJUPtsrjRJcMMvz8Tsok1mVmVn" data-buy>Buy for $14.99</a>
+            <a class="download" href="https://github.com/victorabuchi/notchlight/releases/latest/download/Notchlight.dmg">Try it free <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.6" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10 5.8v7.6M6.7 10.4 10 13.7l3.3-3.3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </div>
+          <p class="requires">One payment, up to 3 Macs. Requires macOS Sequoia or later.</p>
         </div>
       </div>
     </div>
@@ -1424,6 +1441,33 @@ footer .legal { flex-basis: 100%; font-size: 13px; }
 <script>
 (() => {
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Buy opens Polar's checkout over the page, in the page's light or dark look. Polar's script loads only when
+  // someone clicks Buy, so the page itself runs no one else's code; if it can't load, the link opens Polar's
+  // checkout page instead. Cmd-click still opens it in a new tab.
+  let polar = null;
+  const loadPolar = () => polar ??= new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/@polar-sh/checkout@0.4.3/dist/embed.global.js";
+    script.integrity = "sha384-e96p3bMSNUJbavzl83jvbh/LCSQfSkbXCpnzovVeJvZR7Cs9PJEEIlJnmC3khotO";
+    script.crossOrigin = "anonymous";
+    script.onload = () => (window.Polar?.EmbedCheckout ? resolve(window.Polar.EmbedCheckout) : reject());
+    script.onerror = reject;
+    document.head.append(script);
+  });
+  const pageIsDark = () => {
+    const chosen = document.documentElement.dataset.theme;
+    return chosen ? chosen === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  };
+  document.querySelectorAll("[data-buy]").forEach((link) => {
+    link.addEventListener("click", (event) => {
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+      event.preventDefault();
+      loadPolar()
+        .then((checkout) => checkout.create(link.href, { theme: pageIsDark() ? "dark" : "light" }))
+        .catch(() => { polar = null; window.location.href = link.href; });
+    });
+  });
 
   // Copy buttons for the Homebrew command.
   document.querySelectorAll("[data-copy]").forEach((button) => {
@@ -1642,6 +1686,7 @@ footer .legal { flex-basis: 100%; font-size: 13px; }
   const findList = finder.querySelector(".search-results");
 
   const entries = [
+    { title: "Buy Notchlight", kind: "$14.99, up to 3 Macs", href: "https://buy.polar.sh/polar_cl_3kwCipamOJFV6MggVZJUPtsrjRJcMMvz8Tsok1mVmVn", words: "buy purchase price pay licence license key" },
     { title: "Download Notchlight", kind: "For macOS 15 and later", href: "https://github.com/victorabuchi/notchlight/releases/latest/download/Notchlight.dmg", words: "download dmg get mac app" },
     { title: "Install", kind: "Section", href: "#install", words: "install setup steps dmg applications open" },
     { title: "Dynamic Island", kind: "Section", href: "#island", words: "notch live activities alerts island" },
