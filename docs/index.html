@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Notchlight</title>
-<meta name="description" content="Notchlight puts live widgets on your Mac's lock screen and turns the notch into a Dynamic Island, with Apple Music's own lyrics. For macOS 15 and later.">
+<meta name="description" content="Notchlight puts live widgets on your Mac's lock screen and turns the notch into a Dynamic Island and Light: your music with synced lyrics, calendar, notes, timers, to-dos and a tray for files. For macOS 15 and later.">
 <link rel="icon" href="assets/icon-64.png?v=2">
 <link rel="canonical" href="https://notchlight.com/">
 <meta property="og:title" content="Notchlight">
-<meta property="og:description" content="Notchlight puts live widgets on your Mac's lock screen and turns the notch into a Dynamic Island, with Apple Music's own lyrics. For macOS 15 and later.">
+<meta property="og:description" content="Notchlight puts live widgets on your Mac's lock screen and turns the notch into a Dynamic Island and Light: your music with synced lyrics, calendar, notes, timers, to-dos and a tray for files. For macOS 15 and later.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://notchlight.com/">
 <meta property="og:image" content="https://notchlight.com/assets/og.jpg?v=2">
@@ -361,6 +361,80 @@ p { margin: 0; }
 .bubble { position: absolute; top: 0; left: calc(50% + 10cqw + 0.8cqw); width: 2.6cqw; height: 2.6cqw; border-radius: 50%; background: #000; display: grid; place-items: center; transition: left 0.45s cubic-bezier(.3, 1.3, .5, 1); z-index: 2; }
 .bubble .sym { width: 1.5cqw; height: 1.5cqw; }
 .island.open + .bubble { left: calc(50% + 15cqw + 0.8cqw); }
+
+/* The hero's film: the lock screen, then the desktop, where Light drops from the notch with its widgets and
+   then shows the Tray, before folding back. The scene is set on .display by the script; without it (and with
+   reduced motion) the lock screen stays. */
+.display .lock-date, .display .lock-time, .display .login { transition: opacity 0.6s, transform 0.6s; }
+.display[data-scene="desktop"] :is(.lock-date, .lock-time, .login),
+.display[data-scene="light"] :is(.lock-date, .lock-time, .login),
+.display[data-scene="tray"] :is(.lock-date, .lock-time, .login) { opacity: 0; transform: translateY(-1.2cqw); }
+.menubar { position: absolute; inset: 0 0 auto; height: 2.6cqw; display: flex; align-items: center; justify-content: space-between; padding: 0 1.4cqw; font: 600 0.95cqw var(--system); color: #fff; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35); opacity: 0; transition: opacity 0.6s; z-index: 1; }
+.menubar span { display: flex; align-items: center; gap: 1.5cqw; }
+.menubar span:first-child b { font-weight: 700; }
+.menubar svg { width: 1.15cqw; height: 1.15cqw; fill: currentColor; }
+.display:is([data-scene="desktop"], [data-scene="light"], [data-scene="tray"]) .menubar { opacity: 1; }
+.display:is([data-scene="light"], [data-scene="tray"]) :is(.island, .bubble) { opacity: 0; transition: opacity 0.1s; }
+
+.light { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 20cqw; height: 2.6cqw; opacity: 0; z-index: 3; color: #fff; font-family: var(--system);
+  transition: width 0.5s cubic-bezier(.3, 1.2, .5, 1), height 0.55s cubic-bezier(.3, 1.2, .5, 1), opacity 0.12s; }
+.light .body { position: absolute; inset: 0; background: #000; border-radius: 0 0 1.2cqw 1.2cqw; overflow: hidden; transition: border-radius 0.4s; }
+/* The top corners curve out into the screen's edge, as the notch's do. */
+.light::before, .light::after { content: ""; position: absolute; top: 0; width: 1cqw; height: 1cqw; opacity: 0; transition: opacity 0.3s; }
+.light::before { right: 100%; background: radial-gradient(circle at 0 100%, transparent 1cqw, #000 calc(1cqw + 0.5px)); }
+.light::after { left: 100%; background: radial-gradient(circle at 100% 100%, transparent 1cqw, #000 calc(1cqw + 0.5px)); }
+.display[data-scene="light"] .light { width: 90cqw; height: 12.6cqw; opacity: 1; }
+.display[data-scene="tray"] .light { width: 38cqw; height: 11.2cqw; opacity: 1; }
+.display:is([data-scene="light"], [data-scene="tray"]) .light .body { border-radius: 0 0 1.75cqw 1.75cqw; }
+.display:is([data-scene="light"], [data-scene="tray"]) .light::before,
+.display:is([data-scene="light"], [data-scene="tray"]) .light::after { opacity: 1; }
+.light .head { position: absolute; inset: 0 1cqw auto; height: 2.6cqw; display: flex; align-items: center; gap: 0.4cqw; }
+.light .tab { width: 2.4cqw; height: 1.6cqw; border-radius: 9px; display: grid; place-items: center; color: rgba(255, 255, 255, 0.5); transition: background-color 0.3s, color 0.3s; }
+.light .tab svg { width: 0.95cqw; height: 0.95cqw; fill: currentColor; }
+.light .gear { margin-left: auto; width: 1.1cqw; height: 1.1cqw; fill: rgba(255, 255, 255, 0.75); }
+.display[data-scene="light"] .tab.light-tab, .display[data-scene="tray"] .tab.tray-tab { background: rgba(255, 255, 255, 0.16); color: #fff; }
+.light .page { position: absolute; left: 1.2cqw; right: 1.2cqw; top: 3.2cqw; bottom: 1cqw; display: flex; align-items: center; opacity: 0; transition: opacity 0.25s; }
+.display[data-scene="light"] .light .strip, .display[data-scene="tray"] .light .tray { opacity: 1; transition-delay: 0.25s; }
+.strip > div { flex: none; height: 100%; display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+.strip > i { flex: none; width: 1px; height: 80%; margin: 0 0.95cqw; background: rgba(255, 255, 255, 0.12); }
+.strip .l-music { width: 17.3cqw; gap: 0.6cqw; }
+.l-music .top { display: flex; gap: 0.8cqw; align-items: center; }
+.l-music .cover { width: 4.2cqw; height: 4.2cqw; border-radius: 0.65cqw; }
+.l-music .meta { display: grid; gap: 0.05cqw; font-size: 0.8cqw; line-height: 1.25; min-width: 0; }
+.l-music .meta b { font-size: 0.93cqw; }
+.l-music .meta span { color: rgba(255, 255, 255, 0.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.l-music .meta .lyric { color: #c9b6ff; font-weight: 600; }
+.l-music .controls { display: flex; gap: 1.1cqw; margin-top: 0.3cqw; }
+.l-music .controls svg { width: 1.05cqw; height: 1.05cqw; fill: #fff; }
+.l-music .bar { height: 0.33cqw; border-radius: 9px; background: linear-gradient(to right, #fff 46%, rgba(255, 255, 255, 0.18) 46%); }
+.l-music .times { display: flex; justify-content: space-between; font-size: 0.66cqw; font-weight: 600; color: rgba(255, 255, 255, 0.5); }
+.strip .l-mirror { width: 6.9cqw; align-items: center; }
+.l-mirror .ring { position: relative; width: 6.9cqw; height: 6.9cqw; border-radius: 50%; background: rgba(255, 255, 255, 0.1); display: grid; place-content: center; justify-items: center; gap: 0.3cqw; color: rgba(255, 255, 255, 0.55); font-size: 0.8cqw; font-weight: 600; }
+.l-mirror .ring svg { width: 1.7cqw; height: 1.7cqw; fill: currentColor; }
+.l-mirror .facetime { position: absolute; right: 0; bottom: 0; width: 1.7cqw; height: 1.7cqw; border-radius: 50%; background: #34c759; display: grid; place-items: center; }
+.l-mirror .facetime svg { width: 0.8cqw; height: 0.8cqw; fill: #fff; }
+.strip .l-calendar { width: 14.2cqw; justify-content: flex-start; gap: 0.7cqw; padding-top: 0.3cqw; }
+.l-calendar .week { display: flex; align-items: flex-end; gap: 0.2cqw; }
+.l-calendar .month { width: 2.9cqw; font-size: 1.26cqw; font-weight: 700; line-height: 1; }
+.l-calendar .day { width: 1.32cqw; display: grid; justify-items: center; font-size: 0.86cqw; font-weight: 600; color: rgba(255, 255, 255, 0.55); line-height: 1.15; }
+.l-calendar .day small { font-size: 0.53cqw; opacity: 0.7; }
+.l-calendar .day.now { color: #4d99ff; }
+.l-calendar .event { display: grid; border-left: 0.2cqw solid var(--c); padding-left: 0.45cqw; font-size: 0.8cqw; font-weight: 600; line-height: 1.25; }
+.l-calendar .event small { font-size: 0.66cqw; font-weight: 500; color: rgba(255, 255, 255, 0.55); }
+.strip .l-notes { width: 13cqw; justify-content: flex-start; padding: 0.6cqw 0.65cqw; border-radius: 0.93cqw; background: rgba(255, 255, 255, 0.08); font-size: 0.8cqw; line-height: 1.35; }
+.strip .l-timers { width: 13.6cqw; justify-content: flex-start; gap: 0.45cqw; padding-top: 0.3cqw; }
+.l-timers .add { align-self: flex-start; display: flex; align-items: center; gap: 0.35cqw; height: 1.7cqw; padding: 0 0.75cqw; border-radius: 99px; background: rgba(255, 255, 255, 0.14); font-size: 0.8cqw; font-weight: 600; }
+.l-timers .row { display: flex; align-items: center; gap: 0.5cqw; height: 1.7cqw; padding: 0 0.6cqw; border-radius: 0.53cqw; background: rgba(255, 255, 255, 0.08); font-size: 0.93cqw; font-weight: 600; font-variant-numeric: tabular-nums; }
+.l-timers .row span { margin-right: auto; }
+.l-timers .row svg { width: 0.7cqw; height: 0.7cqw; fill: currentColor; opacity: 0.7; }
+.strip .l-todos { width: 13cqw; justify-content: flex-start; gap: 0.5cqw; padding-top: 0.3cqw; font-size: 0.8cqw; font-weight: 500; }
+.l-todos .task-field { display: flex; align-items: center; gap: 0.45cqw; height: 1.85cqw; padding: 0 0.6cqw; border-radius: 0.53cqw; background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.4); }
+.l-todos .item { display: flex; align-items: center; gap: 0.45cqw; }
+.l-todos .item::before { content: ""; width: 0.7cqw; height: 0.7cqw; border-radius: 50%; border: 0.1cqw solid var(--c); flex: none; }
+.light .tray { justify-content: flex-start; gap: 0.6cqw; padding-left: 0.4cqw; }
+.light .file { width: 5.5cqw; display: grid; justify-items: center; gap: 0.3cqw; font-size: 0.66cqw; font-weight: 500; text-align: center; }
+.light .file svg { width: 3cqw; height: 3.6cqw; }
+@media (prefers-reduced-motion: reduce) { .light, .menubar { display: none; } }
 
 /* Sections alternate white and soft grey, like Apple's own pages. */
 section { padding-block: 104px; }
@@ -758,7 +832,7 @@ footer .legal { flex-basis: 100%; font-size: 13px; }
     <div class="wrap">
       <span class="app-icon hero-icon" aria-hidden="true"></span>
       <h1>Notchlight</h1>
-      <p class="lede">Notchlight puts live widgets on your Mac's lock screen and turns the notch into a Dynamic Island: the song that's playing with Apple Music's own lyrics, your calls, notifications and more.</p>
+      <p class="lede">Notchlight puts live widgets on your Mac's lock screen and turns the notch into a Dynamic Island: the song that's playing with its synced lyrics, your calls, notifications and more. Click the notch for Light: your calendar, notes, timers, to-dos and a tray for files.</p>
       <div class="get">
         <a class="buy" href="https://buy.polar.sh/polar_cl_3kwCipamOJFV6MggVZJUPtsrjRJcMMvz8Tsok1mVmVn" data-buy>Buy for $14.99</a>
         <a class="download" href="download/">Try it free <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.6" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10 5.8v7.6M6.7 10.4 10 13.7l3.3-3.3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
@@ -771,7 +845,7 @@ footer .legal { flex-basis: 100%; font-size: 13px; }
         <span>Updates itself</span>
       </div>
 
-      <figure class="mac" aria-label="Notchlight on a MacBook lock screen: the island at the notch shows a song with the hotspot in a circle beside it, above the time. Around it are Up Next, a world clock, the Daily Brief, live lyrics, System, notes, a stock, the battery, the song's artwork, the Music Card, Recent Activity, favourite apps and the login">
+      <figure class="mac" aria-label="Notchlight on a MacBook: on the lock screen the island at the notch shows a song with the hotspot in a circle beside it, above the time; on the desktop, Light drops from the notch with the song, a mirror, the calendar, notes, timers and to-dos, then the Tray with files. Around it are Up Next, a world clock, the Daily Brief, live lyrics, System, notes, a stock, the battery, the song's artwork, the Music Card, Recent Activity, favourite apps and the login">
         <div class="lid">
           <div class="display">
             <span class="silk" aria-hidden="true"></span>
@@ -792,6 +866,43 @@ footer .legal { flex-basis: 100%; font-size: 13px; }
               </div>
             </div>
             <div class="bubble" aria-hidden="true"><span class="sym hotspot"></span></div>
+            <div class="menubar" aria-hidden="true">
+              <span><svg viewBox="0 0 24 24"><path d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.1-.8 1.5 0 1.9.8 3.2.8 1.3 0 2.1-1.2 2.9-2.4.9-1.4 1.3-2.7 1.3-2.8 0 0-2.4-1-2.4-3.9zM14 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.6 2.8-1.4z"/></svg><b>Finder</b>File Edit View Go Window Help</span>
+              <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 18.5a1.6 1.6 0 1 1 0-3.2 1.6 1.6 0 0 1 0 3.2zM5.6 12.4a9 9 0 0 1 12.8 0l-1.5 1.5a6.9 6.9 0 0 0-9.8 0zM2.5 9.3a13.4 13.4 0 0 1 19 0L20 10.8a11.3 11.3 0 0 0-16 0z"/></svg><svg viewBox="0 0 30 14"><rect x="1" y="1" width="24" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-width="1.4"/><rect x="3" y="3" width="13" height="8" rx="2"/><rect x="26.5" y="5" width="2" height="4" rx="1"/></svg>Fri 16 Oct 9:41</span>
+            </div>
+            <div class="light" aria-hidden="true">
+              <div class="body">
+                <div class="head">
+                  <span class="tab light-tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.4h10V21H4zM8.1 19.4l4.3-9.6 1.5.7-3.9 8.9zM11.4 8.9l5.5-5.1 4.5 4.6-6.6 3.9zM16.4 12.9a2.2 2.2 0 0 0 3.6-1.4z"/></svg></span>
+                  <span class="tab tray-tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13l2.5-8h13L21 13v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1zm2.3 0H9a3 3 0 0 0 6 0h3.7l-1.8-6H7.1z"/></svg></span>
+                  <svg class="gear" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zm9 4.7v-2.4l-2.4-.5a7 7 0 0 0-.7-1.7l1.4-2-1.7-1.7-2 1.4a7 7 0 0 0-1.7-.7L13.3 3h-2.4l-.5 2.4a7 7 0 0 0-1.7.7l-2-1.4L5 6.4l1.4 2a7 7 0 0 0-.7 1.7L3 10.8v2.4l2.4.5c.2.6.4 1.2.7 1.7l-1.4 2L6.4 19l2-1.4c.5.3 1.1.5 1.7.7l.5 2.7h2.4l.5-2.4a7 7 0 0 0 1.7-.7l2 1.4 1.7-1.7-1.4-2c.3-.5.5-1.1.7-1.7z"/></svg>
+                </div>
+                <div class="page strip">
+                  <div class="l-music">
+                    <div class="top"><span class="cover"></span><div class="meta"><b>Low Orbit</b><span>Night Signals</span><span>Mira Vale</span><span class="lyric" data-lyric>City lights are spelling out your name</span><div class="controls"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 6v12L2 12zm11 0v12l-9-6z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 6v12l9-6zM2 6v12l9-6z"/></svg></div></div></div>
+                    <div class="bar"></div>
+                    <div class="times"><span>1:42</span><span>-2:03</span></div>
+                  </div>
+                  <i></i>
+                  <div class="l-mirror"><div class="ring"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a7 7 0 0 1 .9 13.9V19h3v2H8v-2h3v-2.1A7 7 0 0 1 12 3zm0 4a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>Mirror<span class="facetime"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1.5l4-2.5v12l-4-2.5V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span></div></div>
+                  <i></i>
+                  <div class="l-calendar">
+                    <div class="week"><span class="month">Oct</span><span class="day"><small>W</small>14</span><span class="day"><small>T</small>15</span><span class="day now"><small>F</small>16</span><span class="day"><small>S</small>17</span><span class="day"><small>S</small>18</span><span class="day"><small>M</small>19</span><span class="day"><small>T</small>20</span></div>
+                    <div class="event" style="--c:#0a84ff">Design review<small>10:30</small></div>
+                    <div class="event" style="--c:#ff9f0a">Lunch with Sam<small>12:30</small></div>
+                  </div>
+                  <i></i>
+                  <div class="l-notes">Notes for me.<br>Pick up the camera at 5.</div>
+                  <i></i>
+                  <div class="l-timers"><span class="add">+ Add Timer</span><div class="row"><span>18:42</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg></div><div class="row"><span>3:10</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg></div></div>
+                  <i></i>
+                  <div class="l-todos"><span class="task-field"><svg viewBox="0 0 16 16" aria-hidden="true" style="width:0.8cqw;height:0.8cqw"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v6M5 8h6" stroke="currentColor" stroke-width="1.3"/></svg>New task…</span><span class="item" style="--c:#ff9f0a">Book the train</span><span class="item" style="--c:#0a84ff">Pick up the camera</span><span class="item" style="--c:#30d158">Call Mum</span></div>
+                </div>
+                <div class="page tray">
+                  <div class="file"><svg viewBox="0 0 30 36" aria-hidden="true"><path d="M3 1h17l9 9v23a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2z" fill="#f2f2f5"/><path d="M20 1v7a2 2 0 0 0 2 2h7z" fill="#d6d6dc"/><rect x="6" y="20" width="18" height="7" rx="1.5" fill="#ff453a"/></svg>Brief.pdf</div><div class="file"><svg viewBox="0 0 30 36" aria-hidden="true"><path d="M3 1h17l9 9v23a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2z" fill="#f2f2f5"/><path d="M20 1v7a2 2 0 0 0 2 2h7z" fill="#d6d6dc"/><rect x="6" y="20" width="18" height="7" rx="1.5" fill="#0a84ff"/></svg>Sunset.jpg</div><div class="file"><svg viewBox="0 0 30 36" aria-hidden="true"><path d="M3 1h17l9 9v23a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2z" fill="#f2f2f5"/><path d="M20 1v7a2 2 0 0 0 2 2h7z" fill="#d6d6dc"/><rect x="6" y="20" width="18" height="7" rx="1.5" fill="#ff9f0a"/></svg>Slides.key</div><div class="file"><svg viewBox="0 0 30 36" aria-hidden="true"><path d="M3 1h17l9 9v23a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2z" fill="#f2f2f5"/><path d="M20 1v7a2 2 0 0 0 2 2h7z" fill="#d6d6dc"/><rect x="6" y="20" width="18" height="7" rx="1.5" fill="#8e8e93"/></svg>Notes.md</div><div class="file"><svg viewBox="0 0 30 36" aria-hidden="true"><path d="M3 1h17l9 9v23a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2z" fill="#f2f2f5"/><path d="M20 1v7a2 2 0 0 0 2 2h7z" fill="#d6d6dc"/><rect x="6" y="20" width="18" height="7" rx="1.5" fill="#30d158"/></svg>Photos.zip</div>
+                </div>
+              </div>
+            </div>
             <div class="lock-date">Friday 16 October</div>
             <div class="lock-time">9:41</div>
             <div class="w w-next">
@@ -986,7 +1097,7 @@ footer .legal { flex-basis: 100%; font-size: 13px; }
         </div>
         <div class="winfo">
           <h3>Live Lyrics</h3>
-          <p>Apple Music&#x27;s synced lyrics, line by line.</p>
+          <p>Synced lyrics, line by line, from Apple Music or LRCLIB.</p>
           <span class="wsizes">Medium · Wide · Large</span>
         </div>
       </article>
@@ -1418,8 +1529,8 @@ footer .legal { flex-basis: 100%; font-size: 13px; }
     <div class="wrap split">
       <div class="stack">
         <span class="eyebrow">Music</span>
-        <h2>Apple Music and Spotify, with the lyrics Music shows.</h2>
-        <p class="lede">The song that's playing in Apple Music or Spotify shows on the lock screen and in the island. Lyrics come from Apple Music: Notchlight reads the time-synced lyrics Music already downloaded, so every line lands exactly when it does in Music.</p>
+        <h2>Apple Music and Spotify, with synced lyrics.</h2>
+        <p class="lede">The song that's playing in Apple Music or Spotify shows on the lock screen and in the island. In Apple Music, Notchlight uses the time-synced lyrics Music downloaded, so every line lands exactly when it does in Music. For other songs, and in Spotify, synced lyrics come from LRCLIB, a free public lyrics library.</p>
         <div class="players">
           <span class="player"><img src="assets/apps/music.png?v=2" alt="">Apple Music</span>
           <span class="player"><img src="assets/apps/spotify.png?v=2" alt="">Spotify</span>
@@ -1443,7 +1554,7 @@ footer .legal { flex-basis: 100%; font-size: 13px; }
         <h2>Everything stays on your Mac.</h2>
       </div>
       <div class="trust">
-        <div><h3>No data collected</h3><p>No account, no analytics. Weather comes from Open-Meteo, lyrics from Music on your Mac, and notifications are read from macOS's own database without leaving it.</p></div>
+        <div><h3>No data collected</h3><p>No account, no analytics. Weather comes from Open-Meteo, lyrics from Music on your Mac or from LRCLIB, and notifications are read from macOS's own database without leaving it.</p></div>
         <div><h3>Notarized by Apple</h3><p>Every release is signed with a Developer ID and scanned by Apple before it reaches you, so it opens like any other app.</p></div>
         <div><h3>Signed updates</h3><p>Notchlight checks for a new version once a day and asks before installing it. Your Mac only accepts updates signed by Notchlight.</p></div>
       </div>
@@ -1482,6 +1593,8 @@ footer .legal { flex-basis: 100%; font-size: 13px; }
           <ul class="plan-list">
             <li><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.2" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="m4.9 8.2 2.1 2.1 4.1-4.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Live widgets on your lock screen, 21 of them</li>
             <li><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.2" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="m4.9 8.2 2.1 2.1 4.1-4.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>The Dynamic Island: your music with its lyrics, calls, trips and more</li>
+            <li><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.2" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="m4.9 8.2 2.1 2.1 4.1-4.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Light at the notch: music, mirror, calendar, notes, timers and to-dos</li>
+            <li><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.2" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="m4.9 8.2 2.1 2.1 4.1-4.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>The Tray: drop files on the notch, or AirDrop them</li>
             <li><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.2" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="m4.9 8.2 2.1 2.1 4.1-4.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Layout Studio and the Layout Gallery</li>
             <li><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.2" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="m4.9 8.2 2.1 2.1 4.1-4.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Updates that install themselves</li>
             <li><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.2" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="m4.9 8.2 2.1 2.1 4.1-4.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Up to 3 Macs per licence</li>
@@ -1515,7 +1628,7 @@ footer .legal { flex-basis: 100%; font-size: 13px; }
         <details id="faq-price"><summary>How much does it cost?</summary><p>$14.99, paid once. It isn't a subscription, and one licence works on up to 3 of your Macs. Try everything free for 7 days first.</p></details>
         <details id="faq-key"><summary>Where's my licence key?</summary><p>On the page after you pay, and in your receipt email. In Notchlight, open Settings, choose Licence and paste it. To move it to another Mac, deactivate it there or in <a href="https://polar.sh/notchlight/portal">Polar's customer portal</a>.</p></details>
         <details id="faq-homebrew"><summary>Can I install it with Homebrew?</summary><p>Yes. Paste this into Terminal:</p><div class="brew"><code id="brew-faq">brew install --cask victorabuchi/tap/notchlight</code><button class="copy" type="button" data-copy="brew-faq">Copy</button></div></details>
-        <details id="faq-4"><summary>Does it work with Spotify?</summary><p>Yes: the song playing in Spotify shows in the island and on the lock screen, with its artwork and controls. Synced lyrics come from Apple Music only.</p></details>
+        <details id="faq-4"><summary>Does it work with Spotify?</summary><p>Yes: the song playing in Spotify shows in the island and on the lock screen, with its artwork, controls and synced lyrics from LRCLIB, when it has them.</p></details>
         <details id="faq-5"><summary>What permissions does it ask for?</summary><p>Only what your widgets use: Calendar, Reminders, Location for weather, Photos, and Automation to read the song in Music or Spotify. Notifications on the island need Full Disk Access, because macOS keeps them in a protected file. The Setup Guide takes you to each one.</p></details>
         <details id="faq-6"><summary>How do updates work?</summary><p>Notchlight looks for a new version once a day and asks before installing it. Choose Check for Updates… in its menu to look now. If you installed it with Homebrew, it updates itself the same way.</p></details>
         <details id="faq-7"><summary>How do I uninstall it?</summary><p>Quit Notchlight from its menu bar icon and drag it from Applications to the Trash. With Homebrew, run <code>brew uninstall --cask notchlight</code>.</p></details>
@@ -1820,7 +1933,8 @@ footer .legal { flex-basis: 100%; font-size: 13px; }
     { title: "Layout Studio", kind: "Section", href: "#studio", words: "drag arrange place move resize restyle studio" },
     { title: "Layout Gallery", kind: "Section", href: "#layouts", words: "presets layouts ready-made gallery" },
     { title: "Appearance", kind: "Section", href: "#appearance", words: "card style glass frosted solid minimal corner radius wallpaper" },
-    { title: "Apple Music lyrics", kind: "Section", href: "#music", words: "music spotify lyrics synced song" },
+    { title: "Music and lyrics", kind: "Section", href: "#music", words: "music spotify lyrics synced song lrclib" },
+    { title: "Light", kind: "In the notch", href: "#top", words: "light nook notch calendar notes timers to-dos reminders mirror camera tray files airdrop shortcuts weather" },
     { title: "Privacy", kind: "Section", href: "#privacy", words: "private data safe notarized signed updates" },
     { title: "Questions", kind: "Section", href: "#faq", words: "faq help questions answers" },
   ];
@@ -1933,9 +2047,25 @@ footer .legal { flex-basis: 100%; font-size: 13px; }
 
   if (reduce) return;
 
-  // The hero island opens into the song card and closes again, as it does on a Mac.
+  // The hero plays like a film: the lock screen and the song card at the notch, then the desktop, where Light
+  // drops from the notch with its widgets and then shows the Tray, before it folds back and the Mac locks.
   const island = document.getElementById("hero-island");
-  setInterval(() => island.classList.toggle("open"), 3800);
+  const display = island.closest(".display");
+  const film = [
+    [0, () => { display.dataset.scene = "lock"; island.classList.remove("open"); }],
+    [1600, () => island.classList.add("open")],
+    [4800, () => island.classList.remove("open")],
+    [5800, () => (display.dataset.scene = "desktop")],
+    [7400, () => (display.dataset.scene = "light")],
+    [12400, () => (display.dataset.scene = "tray")],
+    [15400, () => (display.dataset.scene = "desktop")],
+    [16600, () => (display.dataset.scene = "lock")],
+  ];
+  const play = () => {
+    film.forEach(([at, scene]) => setTimeout(scene, at));
+    setTimeout(play, 18200);
+  };
+  play();
 
   // The lyrics move line by line.
   const lines = ["City lights are spelling out your name", "We drove until the morning found us", "Hold the moment, let the record play", "Every window glowing like a sign"];
