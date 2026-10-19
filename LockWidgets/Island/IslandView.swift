@@ -1,22 +1,30 @@
 import SwiftUI
 
-/// The black shape: square along the top, where it meets the notch and the screen edge, with rounded
-/// bottom corners like the notch's own.
+/// The black shape: rounded bottom corners like the notch's own. Along the top it meets the screen's edge,
+/// and when it's open its top corners flare outward in a curve into that edge, as the notch's do, so it looks
+/// grown out of the notch rather than stuck under it. The flare is drawn outside the rectangle, either side.
 struct IslandShape: Shape {
     var bottomRadius: CGFloat
+    var flare: CGFloat = 0
 
-    var animatableData: CGFloat {
-        get { bottomRadius }
-        set { bottomRadius = newValue }
+    var animatableData: AnimatablePair<CGFloat, CGFloat> {
+        get { AnimatablePair(bottomRadius, flare) }
+        set {
+            bottomRadius = newValue.first
+            flare = newValue.second
+        }
     }
 
     func path(in rect: CGRect) -> Path {
         let r = max(0, min(bottomRadius, rect.height / 2, rect.width / 2))
+        let f = max(0, min(flare, rect.height - r))
         var path = Path()
-        path.move(to: CGPoint(x: rect.minX, y: rect.minY))
+        path.move(to: CGPoint(x: rect.minX - f, y: rect.minY))
+        path.addQuadCurve(to: CGPoint(x: rect.minX, y: rect.minY + f), control: CGPoint(x: rect.minX, y: rect.minY))
         path.addArc(tangent1End: CGPoint(x: rect.minX, y: rect.maxY), tangent2End: CGPoint(x: rect.maxX, y: rect.maxY), radius: r)
         path.addArc(tangent1End: CGPoint(x: rect.maxX, y: rect.maxY), tangent2End: CGPoint(x: rect.maxX, y: rect.minY), radius: r)
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY + f))
+        path.addQuadCurve(to: CGPoint(x: rect.maxX + f, y: rect.minY), control: CGPoint(x: rect.maxX, y: rect.minY))
         path.closeSubpath()
         return path
     }
@@ -27,11 +35,12 @@ struct IslandShape: Shape {
 struct IslandSurface: View {
     var bottomRadius: CGFloat
     var glass: Bool
+    var flare: CGFloat = 0
     @AppStorage(SettingsKey.liquidTint) private var tint = 0.45
     @AppStorage(SettingsKey.liquidClear) private var clear = false
 
     var body: some View {
-        let shape = IslandShape(bottomRadius: bottomRadius)
+        let shape = IslandShape(bottomRadius: bottomRadius, flare: flare)
         ZStack {
             if glass { glassLayer(shape) }
             shape.fill(Color.black).opacity(glass ? 0 : 1)
@@ -65,7 +74,7 @@ struct IslandView: View {
 
     private func island(_ size: CGSize) -> some View {
         ZStack(alignment: .top) {
-            IslandSurface(bottomRadius: model.bottomRadius, glass: liquid && (model.isExpanded || model.primary?.isBanner == true))
+            IslandSurface(bottomRadius: model.bottomRadius, glass: liquid && (model.isExpanded || model.primary?.isBanner == true), flare: model.flare)
                 .frame(width: size.width, height: size.height)
             content
                 .frame(width: size.width, height: size.height, alignment: .top)

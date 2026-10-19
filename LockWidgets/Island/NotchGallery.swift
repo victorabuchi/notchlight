@@ -31,6 +31,7 @@ enum NotchGallery {
             let model = LightModel()
             model.notch = notch
             model.isOpen = true
+            model.trayCount = TrayStore.shared.files.count
             configure(model)
             write(LightView(model: model), to: folder.appendingPathComponent("\(name).png"), wall: wall)
         }

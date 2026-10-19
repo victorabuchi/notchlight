@@ -134,6 +134,14 @@ final class IslandController {
         guard area.insetBy(dx: -8, dy: -8).contains(NSEvent.mouseLocation),
               let activity = target == .bubble ? model.bubbleActivity : model.primary
         else { return true }
+        // A click on a song or another live activity opens Light, unless the app behind it is chosen.
+        // A notification still opens its app.
+        if target == .island, !activity.isTransient, lightEnabled,
+           UserDefaults.standard.string(forKey: SettingsKey.islandClick) != "app"
+        {
+            LightController.shared.open()
+            return true
+        }
         IslandActions.open(activity)
         if activity.isTransient { model.dismissTransient() }
         return true

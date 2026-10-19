@@ -108,8 +108,9 @@ final class WelcomeController {
         self.panel = panel
     }
 
+    /// Room for the shape and the curves either side of its top.
     private func place(_ size: CGSize) {
-        panel?.hang(size)
+        panel?.hang(CGSize(width: size.width + IslandModel.openFlare * 2, height: size.height))
     }
 }
 
@@ -190,7 +191,7 @@ struct WelcomeView: View {
     var body: some View {
         let size = model.size
         ZStack(alignment: .top) {
-            IslandShape(bottomRadius: model.isOpen ? 28 : IslandModel.notchRadius)
+            IslandShape(bottomRadius: model.isOpen ? 28 : IslandModel.notchRadius, flare: model.isOpen ? IslandModel.openFlare : 0)
                 .fill(Color.black)
             VStack(spacing: 0) {
                 // The camera.
@@ -204,7 +205,7 @@ struct WelcomeView: View {
             .opacity(model.isOpen ? 1 : 0)
         }
         .frame(width: size.width, height: size.height, alignment: .top)
-        .clipShape(IslandShape(bottomRadius: model.isOpen ? 28 : IslandModel.notchRadius))
+        .clipShape(IslandShape(bottomRadius: model.isOpen ? 28 : IslandModel.notchRadius, flare: model.isOpen ? IslandModel.openFlare : 0))
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .foregroundStyle(.white)
         .environment(\.colorScheme, .dark)

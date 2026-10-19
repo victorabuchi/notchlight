@@ -17,8 +17,25 @@ final class LightController {
     private var leftAt: Date?
     private var swipe = SwipeTracker()
     private var monitor: Any?
+    private var subscriptions: Set<AnyCancellable> = []
     /// Bumped on every open and close, so a close scheduled by an earlier one doesn't run.
     private var generation = 0
+    /// Bumped on every resize, so only the latest one trims the panel.
+    private var resizing = 0
+
+    private init() {
+        // Each page has its own size: Light fits its widgets, the Tray its files. The panel follows.
+        Publishers.CombineLatest3(model.$page, model.$isDropping, TrayStore.shared.$files.map(\.count))
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _, _, count in
+                guard let self else { return }
+                if model.trayCount != count {
+                    withAnimation(.spring(response: 0.45, dampingFraction: 0.82)) { self.model.trayCount = count }
+                }
+                resize()
+            }
+            .store(in: &subscriptions)
+    }
 
     var isOpen: Bool { panel?.isVisible == true && model.isOpen }
 
@@ -28,7 +45,8 @@ final class LightController {
         if let page {
             model.page = page
         } else if !isOpen {
-            let tray = SettingsKey.isOn(SettingsKey.trayOpensWithFiles) && !TrayStore.shared.files.isEmpty
+            // Light first; the Tray only when that's chosen and it holds files.
+            let tray = SettingsKey.isOn(SettingsKey.trayOpensWithFiles, default: false) && !TrayStore.shared.files.isEmpty
             model.page = tray ? .tray : .light
         }
         withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) { model.isDropping = forDrop }
@@ -39,10 +57,11 @@ final class LightController {
         if panel == nil { makePanel() }
         model.notch = island.notch
         model.widgets = LightWidget.chosen
+        model.trayCount = TrayStore.shared.files.count
         // It grows out of whatever the island is showing, and folds back into it.
         model.startSize = island.size == .zero ? island.notch : island.size
         model.isOpen = false
-        panel?.hang(model.openSize)
+        panel?.hang(model.frameSize)
         IslandController.shared.isSuppressed = true
         panel?.orderFrontRegardless()
         DispatchQueue.main.async { [model] in
@@ -69,6 +88,20 @@ final class LightController {
             guard let self, generation == current else { return }
             panel?.orderOut(nil)
             IslandController.shared.isSuppressed = false
+        }
+    }
+
+    /// Big enough for the old and new size while the shape changes, then just the new one, so the panel never
+    /// covers more of the menu bar than it shows.
+    private func resize() {
+        guard isOpen, let panel else { return }
+        resizing += 1
+        let current = resizing
+        let target = model.frameSize
+        panel.hang(CGSize(width: max(panel.frame.width, target.width), height: max(panel.frame.height, target.height)))
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
+            guard let self, resizing == current, isOpen else { return }
+            panel.hang(model.frameSize)
         }
     }
 
@@ -134,15 +167,33 @@ final class LightModel: ObservableObject {
     @Published var isOpen = false
     /// Files are being dragged to the notch: Light shows where they can go.
     @Published var isDropping = false
+    @Published var trayCount = 0
     var notch = CGSize(width: 185, height: 32)
     var startSize = CGSize(width: 185, height: 32)
     var widgets = LightWidget.allCases
 
-    /// Wide enough for the widgets side by side, as wide as the screen allows.
+    /// Light is wide enough for its widgets side by side; the Tray grows with its files; the drop area holds
+    /// its two places. None is wider than the screen allows.
     var openSize: CGSize {
-        let strip = widgets.map(\.width).reduce(0, +) + CGFloat(max(widgets.count - 1, 0)) * LightWidget.gap + 36
-        let screen = (IslandModel.screen?.frame.width ?? 1512) - 40
-        return CGSize(width: min(max(strip, notch.width + 280, 480), screen), height: notch.height + 150)
+        let screen = (IslandModel.screen?.frame.width ?? 1512) - 40 - IslandModel.openFlare * 2
+        let least = max(notch.width + 220, 440)
+        if isDropping {
+            return CGSize(width: min(least + 40, screen), height: notch.height + 128)
+        }
+        switch page {
+        case .light:
+            let strip = widgets.map(\.width).reduce(0, +) + CGFloat(max(widgets.count - 1, 0)) * LightWidget.gap + 36
+            return CGSize(width: min(max(strip, least), screen), height: notch.height + 150)
+        case .tray:
+            let files = 44 + CGFloat(trayCount) * TrayFile.pitch
+            return CGSize(width: min(max(files, least), screen), height: notch.height + 128)
+        }
+    }
+
+    /// The panel: the shape and the curves either side of its top.
+    var frameSize: CGSize {
+        let size = openSize
+        return CGSize(width: size.width + IslandModel.openFlare * 2, height: size.height)
     }
     var size: CGSize { isOpen ? openSize : startSize }
 }
@@ -155,7 +206,7 @@ struct LightView: View {
         let size = model.size
         let radius: CGFloat = model.isOpen ? 26 : IslandModel.notchRadius
         ZStack(alignment: .top) {
-            IslandSurface(bottomRadius: radius, glass: liquid && model.isOpen)
+            IslandSurface(bottomRadius: radius, glass: liquid && model.isOpen, flare: model.isOpen ? IslandModel.openFlare : 0)
             VStack(spacing: 0) {
                 header
                     .frame(height: model.notch.height)
@@ -177,7 +228,7 @@ struct LightView: View {
             .opacity(model.isOpen ? 1 : 0)
         }
         .frame(width: size.width, height: size.height, alignment: .top)
-        .clipShape(IslandShape(bottomRadius: radius))
+        .clipShape(IslandShape(bottomRadius: radius, flare: model.isOpen ? IslandModel.openFlare : 0))
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .foregroundStyle(.white)
         .environment(\.colorScheme, .dark)
@@ -252,8 +303,9 @@ enum LightWidget: String, CaseIterable, Identifiable {
     /// Room for the line between two widgets.
     static let gap: CGFloat = 29
 
-    /// The widgets chosen in Notch Settings; all of them until the user picks.
+    /// The widgets chosen in Notch Settings; all of them until the user picks, or the song alone.
     static var chosen: [LightWidget] {
+        if UserDefaults.standard.string(forKey: SettingsKey.lightShows) == "music" { return [.music] }
         guard let saved = UserDefaults.standard.string(forKey: SettingsKey.lightWidgets) else { return allCases }
         let names = Set(saved.split(separator: ",").map(String.init))
         return allCases.filter { names.contains($0.rawValue) }
@@ -938,6 +990,9 @@ private struct TrayPage: View {
 
 /// A file in the Tray: its icon and name. Drag it out to move it on, click to open it, × to let it go.
 private struct TrayFile: View {
+    /// A file's width in the row, with the gap after it.
+    static let pitch: CGFloat = 92
+
     let url: URL
     @State private var hovering = false
 

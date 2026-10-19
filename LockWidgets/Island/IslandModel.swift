@@ -401,6 +401,16 @@ final class IslandModel: ObservableObject {
         return CGSize(width: notch.width + Self.wing(notch) * 2, height: notch.height)
     }
 
+    /// How far the island's top corners curve out into the screen's edge: open cards and banners flare, as
+    /// a notch opening does; the closed island keeps the notch's own straight sides.
+    var flare: CGFloat {
+        guard let primary else { return 0 }
+        return isExpanded || primary.isBanner ? 12 : 0
+    }
+
+    /// The flare of a big open panel: Light, the Tray and the welcome.
+    static let openFlare: CGFloat = 14
+
     /// The notch's own bottom corner radius, used when nothing is live.
     static let notchRadius: CGFloat = 10
 

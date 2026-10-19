@@ -10,7 +10,7 @@ struct IslandSettingsPage: View {
                 PreviewStage(height: 240) {
                     VStack(spacing: 14) {
                         IslandPreview()
-                        Text("A song or your hotspot shows beside the notch, like the iPhone. Point at it to see more; click it to open the app.")
+                        Text("A song or your hotspot shows beside the notch, like the iPhone. Point at it to see more; click it for Light.")
                             .font(.callout)
                             .foregroundStyle(.white.opacity(0.8))
                     }

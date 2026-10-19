@@ -218,7 +218,7 @@ private struct NotchGeneralTab: View {
             SettingsKey.islandHoverOpens, SettingsKey.notchWidthAdjust, SettingsKey.notchHeightAdjust, SettingsKey.gestures,
             SettingsKey.gestureOpenClose, SettingsKey.gestureMedia, SettingsKey.gestureInvert, SettingsKey.liquidGlass,
             SettingsKey.liquidTint, SettingsKey.liquidClear, SettingsKey.lightEnabled, SettingsKey.lightOnHover,
-            SettingsKey.lightWidgets, SettingsKey.trayOpensWithFiles, SettingsKey.dropArea, SettingsKey.dropAirDrop,
+            SettingsKey.lightWidgets, SettingsKey.lightShows, SettingsKey.islandClick, SettingsKey.trayOpensWithFiles, SettingsKey.dropArea, SettingsKey.dropAirDrop,
         ]
         keys.forEach(UserDefaults.standard.removeObject(forKey:))
     }
@@ -287,11 +287,39 @@ private struct LightTab: View {
     @AppStorage(SettingsKey.lightEnabled) private var light = true
     @AppStorage(SettingsKey.lightOnHover) private var onHover = false
     @AppStorage(SettingsKey.lightWidgets) private var widgets = LightWidget.allCases.map(\.rawValue).joined(separator: ",")
+    @AppStorage(SettingsKey.lightShows) private var shows = "all"
+    @AppStorage(SettingsKey.islandClick) private var click = "light"
 
     var body: some View {
         TabForm {
-            Check("Enable Light", "Click the notch to open Light: your widgets side by side, and the Tray. A click on a live activity still opens its app.", isOn: $light)
+            Check("Enable Light", "Click the notch to open Light: your widgets side by side, and the Tray.", isOn: $light)
             Divider()
+            LabeledContent("Light shows:") {
+                Picker("Light shows", selection: $shows) {
+                    Text("All my widgets").tag("all")
+                    Text("Music only").tag("music")
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .frame(width: 260)
+            }
+            .disabled(!light)
+            LabeledContent("Clicking the island:") {
+                VStack(alignment: .leading, spacing: 4) {
+                    Picker("Clicking the island", selection: $click) {
+                        Text("Opens Light").tag("light")
+                        Text("Opens the app").tag("app")
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+                    .frame(width: 260)
+                    Text("While a song or another activity is live. Pointing at the island still shows its card with the lyric, and a notification always opens its app.")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .disabled(!light)
             Check("Open when you point at the notch", "Light drops down as the pointer rests on the empty notch, without a click.", isOn: $onHover)
                 .disabled(!light)
             LabeledContent("Widgets:") {
@@ -305,7 +333,7 @@ private struct LightTab: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
-            .disabled(!light)
+            .disabled(!light || shows == "music")
         }
     }
 }
@@ -323,12 +351,12 @@ extension LightTab {
 }
 
 private struct TrayTab: View {
-    @AppStorage(SettingsKey.trayOpensWithFiles) private var opensWithFiles = true
+    @AppStorage(SettingsKey.trayOpensWithFiles) private var opensWithFiles = false
     @ObservedObject private var tray = TrayStore.shared
 
     var body: some View {
         TabForm {
-            Check("Open the Tray when files are in it", "Light opens on the Tray while it holds files. You can still switch to Light.", isOn: $opensWithFiles)
+            Check("Open the Tray when files are in it", "Light opens on the Tray, not Light, while the Tray holds files. You can still switch.", isOn: $opensWithFiles)
             Divider()
             LabeledContent("In the Tray:") {
                 HStack {
