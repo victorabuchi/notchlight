@@ -52,6 +52,9 @@
   --chip: rgba(255, 255, 255, 0.9);
   --wall: url("assets/walls/macos-light.webp?v=2");
   --app-icon: url("assets/icon.png?v=2");
+  /* Which MacNative badge the footer shows. */
+  --badge-light: block;
+  --badge-dark: none;
   /* The Layout Studio window, in macOS's own light or dark look. */
   --w-bg: #ffffff;
   --w-side: #ececf1;
@@ -104,6 +107,8 @@
     --chip: rgba(44, 44, 46, 0.9);
     --wall: url("assets/walls/macos-dark.webp?v=2");
     --app-icon: url("assets/icon-dark.png?v=2");
+    --badge-light: none;
+    --badge-dark: block;
     --w-bg: #1e1e20;
     --w-side: #2a2a2d;
     --w-ink: #f2f2f7;
@@ -146,6 +151,8 @@
   --chip: rgba(44, 44, 46, 0.9);
   --wall: url("assets/walls/macos-dark.webp?v=2");
   --app-icon: url("assets/icon-dark.png?v=2");
+  --badge-light: none;
+  --badge-dark: block;
   --w-bg: #1e1e20;
   --w-side: #2a2a2d;
   --w-ink: #f2f2f7;
@@ -656,6 +663,9 @@ footer nav { display: flex; flex-wrap: wrap; gap: 18px; margin-left: auto; }
 footer a { text-decoration: none; color: var(--muted); }
 footer a:hover { color: var(--ink); }
 footer .legal { flex-basis: 100%; font-size: 13px; }
+.listed img { width: 170px; height: auto; }
+.listed .light { display: var(--badge-light); }
+.listed .dark { display: var(--badge-dark); }
 .theme-switcher { display: inline-flex; align-items: center; border: 1px solid var(--accent); border-radius: 980px; overflow: hidden; }
 .theme-switcher button { margin: 0; padding: 3px 13px; border: 0; border-radius: 980px; background: none; color: var(--accent); font: 500 12px/1.4 var(--body); cursor: pointer; transition: background-color 0.2s, color 0.2s; }
 .theme-switcher button[aria-checked="true"] { background: var(--button); color: var(--on-button); }
@@ -1475,6 +1485,10 @@ footer .legal { flex-basis: 100%; font-size: 13px; }
 <footer>
   <div class="wrap">
     <span>Notchlight by Victor Abuchi</span>
+    <a class="listed" href="https://macnative.io/apps/notchlight?utm_source=macnative-badge&amp;utm_medium=referral" target="_blank" rel="noopener">
+      <img class="light" src="https://macnative.io/badge?kind=listed&amp;theme=default&amp;slug=notchlight" alt="Listed on MacNative" width="212" height="58" loading="lazy">
+      <img class="dark" src="https://macnative.io/badge?kind=listed&amp;theme=dark&amp;slug=notchlight" alt="Listed on MacNative" width="212" height="58" loading="lazy">
+    </a>
     <nav aria-label="Links">
       <a href="https://github.com/victorabuchi/notchlight">GitHub</a>
       <a href="https://github.com/victorabuchi/notchlight/releases">Releases</a>
