@@ -218,7 +218,7 @@ private struct NotchGeneralTab: View {
             SettingsKey.islandHoverOpens, SettingsKey.notchWidthAdjust, SettingsKey.notchHeightAdjust, SettingsKey.gestures,
             SettingsKey.gestureOpenClose, SettingsKey.gestureMedia, SettingsKey.gestureInvert, SettingsKey.liquidGlass,
             SettingsKey.liquidTint, SettingsKey.liquidClear, SettingsKey.lightEnabled, SettingsKey.lightOnHover,
-            SettingsKey.lightMirror, SettingsKey.trayOpensWithFiles, SettingsKey.dropArea, SettingsKey.dropAirDrop,
+            SettingsKey.lightWidgets, SettingsKey.trayOpensWithFiles, SettingsKey.dropArea, SettingsKey.dropAirDrop,
         ]
         keys.forEach(UserDefaults.standard.removeObject(forKey:))
     }
@@ -286,16 +286,38 @@ private struct GesturesTab: View {
 private struct LightTab: View {
     @AppStorage(SettingsKey.lightEnabled) private var light = true
     @AppStorage(SettingsKey.lightOnHover) private var onHover = false
-    @AppStorage(SettingsKey.lightMirror) private var mirror = true
+    @AppStorage(SettingsKey.lightWidgets) private var widgets = LightWidget.allCases.map(\.rawValue).joined(separator: ",")
 
     var body: some View {
         TabForm {
-            Check("Enable Light", "Click the notch to open Light: the song that's playing with its lyric and controls, a mirror from your camera, and the Tray. A click on a live activity still opens its app.", isOn: $light)
+            Check("Enable Light", "Click the notch to open Light: your widgets side by side, and the Tray. A click on a live activity still opens its app.", isOn: $light)
             Divider()
             Check("Open when you point at the notch", "Light drops down as the pointer rests on the empty notch, without a click.", isOn: $onHover)
                 .disabled(!light)
-            Check("Show the mirror", "A circle that shows your camera when you click it, to check how you look before a call. The camera turns off when Light closes.", isOn: $mirror)
-                .disabled(!light)
+            LabeledContent("Widgets:") {
+                VStack(alignment: .leading, spacing: 7) {
+                    ForEach(LightWidget.allCases) { widget in
+                        Toggle(widget.title, isOn: shows(widget))
+                    }
+                    Text("They sit side by side in Light, in this order. The Mirror shows your camera only when you click it, and turns it off when Light closes.")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .disabled(!light)
+        }
+    }
+}
+
+extension LightTab {
+    private func shows(_ widget: LightWidget) -> Binding<Bool> {
+        Binding {
+            widgets.split(separator: ",").contains { $0 == widget.rawValue }
+        } set: { on in
+            var chosen = Set(widgets.split(separator: ",").map(String.init))
+            if on { chosen.insert(widget.rawValue) } else { chosen.remove(widget.rawValue) }
+            widgets = LightWidget.allCases.map(\.rawValue).filter(chosen.contains).joined(separator: ",")
         }
     }
 }

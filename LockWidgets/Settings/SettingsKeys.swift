@@ -50,7 +50,9 @@ enum SettingsKey {
     static let liquidClear = "liquidClear"
     static let lightEnabled = "lightEnabled"
     static let lightOnHover = "lightOnHover"
-    static let lightMirror = "lightMirror"
+    /// The widgets Light shows, in order, as their names joined by commas.
+    static let lightWidgets = "lightWidgets"
+    static let lightNotes = "lightNotes"
     static let trayOpensWithFiles = "trayOpensWithFiles"
     static let trayFiles = "trayFiles"
     static let dropArea = "dropArea"

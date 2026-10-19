@@ -69,6 +69,7 @@
 		B68A0FFCD5CEFAEFE740A663 /* PhotosStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0898E2431D9B5E4809FB335 /* PhotosStore.swift */; };
 		BD7B74DF67C7A002BCB21FFB /* SkyLightWindow in Frameworks */ = {isa = PBXBuildFile; productRef = 971F8C6EB6525354011681E8 /* SkyLightWindow */; };
 		C2C478E31A770DC83E86961D /* LayoutStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62CEFE7F9ABFBC92793B4690 /* LayoutStore.swift */; };
+		C4444DBCE1AF7DB4AD89629D /* CountdownStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49238E804761E15218A960D /* CountdownStore.swift */; };
 		C4D9C865B3BDEADC9E9E52F4 /* NotchSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2DC02F0682B95A701A2BD75 /* NotchSettings.swift */; };
 		CD51DB4356E8C25BAA8591CB /* StatusMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D20AD676D5BD191B77CCEB /* StatusMonitor.swift */; };
 		D0C46BF718881EBD91F7D12D /* DeviceMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA65EB68D63BB068EC166544 /* DeviceMonitor.swift */; };
@@ -159,6 +160,7 @@
 		E1A65F02971426C626E09C01 /* SetupGuide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupGuide.swift; sourceTree = "<group>"; };
 		E247A3444F4E8B1630533277 /* PhotosWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotosWidget.swift; sourceTree = "<group>"; };
 		E3D4B280E0A6F0FAAECBA14B /* WidgetCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetCard.swift; sourceTree = "<group>"; };
+		E49238E804761E15218A960D /* CountdownStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountdownStore.swift; sourceTree = "<group>"; };
 		E623E3C959D0409FB161F2BA /* BatteryMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryMonitor.swift; sourceTree = "<group>"; };
 		E76A8A810247D9D17F9128BA /* IslandView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandView.swift; sourceTree = "<group>"; };
 		E99FB43B933F43756700684B /* OverlayManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayManager.swift; sourceTree = "<group>"; };
@@ -256,6 +258,7 @@
 				1CA8579E6D602C960EE54CFE /* AppleMusicLyrics.swift */,
 				E623E3C959D0409FB161F2BA /* BatteryMonitor.swift */,
 				BB6AF92AA3C096A2C102584A /* CalendarStore.swift */,
+				E49238E804761E15218A960D /* CountdownStore.swift */,
 				CA65EB68D63BB068EC166544 /* DeviceMonitor.swift */,
 				406E0CD205C3061CF6EFE586 /* EarthStore.swift */,
 				3C7C6BDC2A9C99596CFCFE3F /* LicenseStore.swift */,
@@ -425,6 +428,7 @@
 				07AE050F531B1D09BB61F393 /* CalendarStore.swift in Sources */,
 				AE7592EBB34634614B783B06 /* CalendarWidget.swift in Sources */,
 				5DB39BA63B65E1585327A015 /* ClockWidget.swift in Sources */,
+				C4444DBCE1AF7DB4AD89629D /* CountdownStore.swift in Sources */,
 				37BF9D2007A3BD1E1C46B18D /* DailyBriefWidget.swift in Sources */,
 				D0C46BF718881EBD91F7D12D /* DeviceMonitor.swift in Sources */,
 				FF78446DB95D86E2A4E1A8B5 /* EarthStore.swift in Sources */,

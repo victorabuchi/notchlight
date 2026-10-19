@@ -66,6 +66,23 @@ final class CalendarStore: ObservableObject {
         eventDays = days
     }
 
+    /// One day's events, all-day ones first, for Light's calendar.
+    func events(on day: Date) -> [EKEvent] {
+        let calendar = Calendar.current
+        let start = calendar.startOfDay(for: day)
+        let end = calendar.date(byAdding: .day, value: 1, to: start)!
+        #if DEBUG
+        if WidgetGallery.isRendering { return events.filter { $0.startDate >= start && $0.startDate < end } }
+        #endif
+        guard hasAccess else { return [] }
+        return store.events(matching: store.predicateForEvents(withStart: start, end: end, calendars: nil))
+            .filter { $0.status != .canceled }
+            .sorted { lhs, rhs in
+                if lhs.isAllDay != rhs.isAllDay { return lhs.isAllDay }
+                return lhs.startDate < rhs.startDate
+            }
+    }
+
     static func dayKey(_ date: Date) -> String {
         let parts = Calendar.current.dateComponents([.year, .month, .day], from: date)
         return String(format: "%04d-%02d-%02d", parts.year!, parts.month!, parts.day!)

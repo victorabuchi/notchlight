@@ -4,9 +4,10 @@ import Combine
 import SwiftUI
 import UniformTypeIdentifiers
 
-/// Light: the notch opened wide. A click on the notch drops it down with the song that's playing and a mirror
-/// from the camera, and a Tray that holds files dragged to the notch until you drag them out again. Dragging
-/// files to the notch opens it with places to drop them: the Tray, or AirDrop.
+/// Light: the notch opened wide. A click on the notch drops it down with widgets side by side (the song that's
+/// playing, a mirror from the camera, the week's calendar, notes, timers and to-dos) and a Tray that holds files
+/// dragged to the notch until you drag them out again. Dragging files to the notch opens it with places to drop
+/// them: the Tray, or AirDrop.
 final class LightController {
     static let shared = LightController()
 
@@ -37,6 +38,7 @@ final class LightController {
         let island = IslandModel.shared
         if panel == nil { makePanel() }
         model.notch = island.notch
+        model.widgets = LightWidget.chosen
         // It grows out of whatever the island is showing, and folds back into it.
         model.startSize = island.size == .zero ? island.notch : island.size
         model.isOpen = false
@@ -70,15 +72,17 @@ final class LightController {
         }
     }
 
-    /// Closes Light shortly after the pointer leaves it, unless a drag is still on its way.
+    /// Closes Light shortly after the pointer leaves it, unless a drag is still on its way. While you type a
+    /// note or a to-do it waits longer, so a stray move of the pointer doesn't lose your place.
     private func track() {
         guard let panel else { return }
         let inside = panel.frame.insetBy(dx: -6, dy: -6).contains(NSEvent.mouseLocation)
         let dragging = NSEvent.pressedMouseButtons & 1 != 0
+        let typing = panel.isKeyWindow && panel.firstResponder is NSTextView
         if inside || dragging {
             leftAt = nil
         } else if let left = leftAt {
-            if Date.now.timeIntervalSince(left) > 0.5 { close() }
+            if Date.now.timeIntervalSince(left) > (typing ? 3 : 0.5) { close() }
         } else {
             leftAt = .now
         }
@@ -87,7 +91,8 @@ final class LightController {
     }
 
     private func makePanel() {
-        let panel = NSPanel.atNotch(level: .statusBar + 8)
+        // It can take the keyboard, for notes and to-dos, without bringing Notchlight to the front.
+        let panel = NSPanel.atNotch(level: .statusBar + 8, takesKeyboard: true)
         panel.contentView = NotchHostingView(rootView: LightView(model: model))
         self.panel = panel
         // Swipe up to fold Light away; sideways to change songs.
@@ -131,8 +136,14 @@ final class LightModel: ObservableObject {
     @Published var isDropping = false
     var notch = CGSize(width: 185, height: 32)
     var startSize = CGSize(width: 185, height: 32)
+    var widgets = LightWidget.allCases
 
-    var openSize: CGSize { CGSize(width: max(notch.width + 280, 480), height: notch.height + 148) }
+    /// Wide enough for the widgets side by side, as wide as the screen allows.
+    var openSize: CGSize {
+        let strip = widgets.map(\.width).reduce(0, +) + CGFloat(max(widgets.count - 1, 0)) * LightWidget.gap + 36
+        let screen = (IslandModel.screen?.frame.width ?? 1512) - 40
+        return CGSize(width: min(max(strip, notch.width + 280, 480), screen), height: notch.height + 150)
+    }
     var size: CGSize { isOpen ? openSize : startSize }
 }
 
@@ -152,7 +163,7 @@ struct LightView: View {
                     if model.isDropping {
                         DropZones(model: model)
                     } else if model.page == .light {
-                        LightMedia()
+                        LightStrip(widgets: model.widgets)
                     } else {
                         TrayPage(model: model)
                     }
@@ -210,38 +221,96 @@ struct LightView: View {
 
 // MARK: Light
 
-/// The song that's playing, with its controls and progress, beside the mirror.
-private struct LightMedia: View {
+/// The widgets Light can show, side by side in this order.
+enum LightWidget: String, CaseIterable, Identifiable {
+    case music, mirror, calendar, notes, timers, todos
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .music: "Music"
+        case .mirror: "Mirror"
+        case .calendar: "Calendar"
+        case .notes: "Notes"
+        case .timers: "Timers"
+        case .todos: "To-dos"
+        }
+    }
+
+    var width: CGFloat {
+        switch self {
+        case .music: 262
+        case .mirror: 104
+        case .calendar: 214
+        case .notes: 196
+        case .timers: 206
+        case .todos: 196
+        }
+    }
+
+    /// Room for the line between two widgets.
+    static let gap: CGFloat = 29
+
+    /// The widgets chosen in Notch Settings; all of them until the user picks.
+    static var chosen: [LightWidget] {
+        guard let saved = UserDefaults.standard.string(forKey: SettingsKey.lightWidgets) else { return allCases }
+        let names = Set(saved.split(separator: ",").map(String.init))
+        return allCases.filter { names.contains($0.rawValue) }
+    }
+}
+
+/// The chosen widgets in a row, with a fine line between each, scrolling sideways on a narrow screen.
+private struct LightStrip: View {
+    let widgets: [LightWidget]
+
+    var body: some View {
+        Sideways {
+            HStack(alignment: .center, spacing: 0) {
+                ForEach(Array(widgets.enumerated()), id: \.element) { index, widget in
+                    if index > 0 {
+                        Rectangle()
+                            .fill(Color.white.opacity(0.12))
+                            .frame(width: 1)
+                            .padding(.vertical, 6)
+                            .padding(.horizontal, (LightWidget.gap - 1) / 2)
+                    }
+                    Group {
+                        switch widget {
+                        case .music: LightMusic()
+                        case .mirror: MirrorCircle(size: 104)
+                        case .calendar: LightCalendar()
+                        case .notes: LightNotes()
+                        case .timers: LightTimers()
+                        case .todos: LightTodos()
+                        }
+                    }
+                    .frame(width: widget.width)
+                }
+            }
+            .frame(maxHeight: .infinity)
+        }
+    }
+}
+
+/// The song that's playing, with its lyric, controls and progress.
+private struct LightMusic: View {
     @ObservedObject private var music = NowPlayingStore.shared
     @ObservedObject private var lyrics = LyricsStore.shared
-    @AppStorage(SettingsKey.lightMirror) private var mirror = true
     @AppStorage(SettingsKey.islandLyrics) private var showLyrics = true
 
     var body: some View {
-        HStack(spacing: 0) {
-            Group {
-                if let track = music.track {
-                    player(track)
-                } else {
-                    nothingPlaying
-                }
-            }
-            .frame(maxWidth: .infinity)
-            if mirror {
-                Rectangle()
-                    .fill(Color.white.opacity(0.12))
-                    .frame(width: 1)
-                    .padding(.vertical, 4)
-                    .padding(.horizontal, 16)
-                MirrorCircle(size: 108)
-            }
+        if let track = music.track {
+            player(track)
+        } else {
+            nothingPlaying
         }
     }
 
     private func player(_ track: NowPlayingStore.Track) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 14) {
-                Artwork(image: music.artwork, size: 72, cornerRadius: 10)
+            HStack(spacing: 12) {
+                Artwork(image: music.artwork, size: 64, cornerRadius: 10)
                 VStack(alignment: .leading, spacing: 1) {
                     Text(track.title)
                         .font(.system(size: 14, weight: .bold))
@@ -487,6 +556,291 @@ private struct CameraPreview: NSViewRepresentable {
                 connection.isVideoMirrored = true
             }
         }
+    }
+}
+
+// MARK: Calendar, notes, timers and to-dos
+
+/// The week around today, and the chosen day's events.
+private struct LightCalendar: View {
+    @ObservedObject private var store = CalendarStore.shared
+    @State private var selected = Calendar.current.startOfDay(for: .now)
+
+    private var days: [Date] {
+        let today = Calendar.current.startOfDay(for: .now)
+        return (-1 ... 5).compactMap { Calendar.current.date(byAdding: .day, value: $0, to: today) }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .lastTextBaseline, spacing: 3) {
+                Text(selected.formatted(.dateTime.month(.abbreviated)))
+                    .font(.system(size: 19, weight: .bold))
+                    .frame(width: 44, alignment: .leading)
+                ForEach(days, id: \.self) { day in
+                    let isSelected = Calendar.current.isDate(day, inSameDayAs: selected)
+                    let isToday = Calendar.current.isDateInToday(day)
+                    Button { selected = day } label: {
+                        VStack(spacing: 1) {
+                            Text(day.formatted(.dateTime.weekday(.narrow)))
+                                .font(.system(size: 8, weight: .semibold))
+                                .opacity(0.6)
+                            Text(day.formatted(.dateTime.day(.twoDigits)))
+                                .font(.system(size: 13, weight: .semibold).monospacedDigit())
+                        }
+                        .foregroundStyle(isSelected ? Color(red: 0.3, green: 0.6, blue: 1) : .white.opacity(isToday ? 1 : 0.55))
+                        .frame(width: 20)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(IslandButtonStyle())
+                }
+            }
+            if !store.hasAccess {
+                Button("Allow Calendar Access") {
+                    store.status == .notDetermined ? store.requestAccess() : store.openPrivacySettings()
+                }
+                .buttonStyle(NotchPillStyle())
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                let events = store.events(on: selected)
+                if events.isEmpty {
+                    VStack(spacing: 5) {
+                        Image(systemName: "calendar.badge.checkmark")
+                            .font(.system(size: 15))
+                        Text(Calendar.current.isDateInToday(selected) ? "Nothing for today" : "Nothing that day")
+                            .font(.system(size: 11, weight: .medium))
+                    }
+                    .foregroundStyle(.white.opacity(0.5))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    VStack(alignment: .leading, spacing: 6) {
+                        // By position: a repeating event's days share one identifier.
+                        ForEach(Array(events.prefix(3).enumerated()), id: \.offset) { _, event in
+                            HStack(spacing: 7) {
+                                Capsule()
+                                    .fill(Color(cgColor: event.calendar?.cgColor ?? NSColor.systemBlue.cgColor))
+                                    .frame(width: 3, height: 24)
+                                VStack(alignment: .leading, spacing: 0) {
+                                    Text(event.title ?? "Event")
+                                        .font(.system(size: 12, weight: .semibold))
+                                    Text(event.isAllDay ? "All day" : event.startDate.formatted(date: .omitted, time: .shortened))
+                                        .font(.system(size: 10, weight: .medium))
+                                        .foregroundStyle(.white.opacity(0.55))
+                                }
+                                .lineLimit(1)
+                            }
+                        }
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                }
+            }
+        }
+    }
+}
+
+/// A note that stays between visits.
+private struct LightNotes: View {
+    @AppStorage(SettingsKey.lightNotes) private var text = ""
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color.white.opacity(0.08))
+            NotchTextEditor(text: $text, sample: "Notes for me.\nPick up the camera at 5.")
+                .font(.system(size: 12))
+                .padding(.horizontal, 8)
+                .padding(.vertical, 9)
+            if text.isEmpty, !NotchGallery.isDrawing {
+                Text("Notes for me…")
+                    .font(.system(size: 12))
+                    .foregroundStyle(.white.opacity(0.35))
+                    .padding(.horizontal, 13)
+                    .padding(.vertical, 9)
+                    .allowsHitTesting(false)
+            }
+        }
+        .frame(maxHeight: .infinity)
+    }
+}
+
+/// Countdown timers: quick lengths to start one, then each one's time left.
+private struct LightTimers: View {
+    @ObservedObject private var store = CountdownStore.shared
+    @State private var choosing = false
+    private static let lengths: [(String, TimeInterval)] = [("1m", 60), ("5m", 300), ("10m", 600), ("25m", 1500), ("1h", 3600)]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if choosing || store.timers.isEmpty {
+                HStack(spacing: 5) {
+                    ForEach(Self.lengths, id: \.0) { name, seconds in
+                        Button(name) {
+                            store.add(seconds)
+                            choosing = false
+                        }
+                        .buttonStyle(NotchPillStyle(compact: true))
+                    }
+                }
+            } else {
+                Button { choosing = true } label: {
+                    Label("Add Timer", systemImage: "plus")
+                }
+                .buttonStyle(NotchPillStyle())
+            }
+            if store.timers.isEmpty {
+                Text("Pick a length to start a timer. It chimes at zero.")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.white.opacity(0.5))
+            }
+            TimelineView(.periodic(from: .now, by: 1)) { context in
+                VStack(spacing: 5) {
+                    ForEach(store.timers.suffix(3)) { timer in
+                        HStack(spacing: 7) {
+                            Image(systemName: timer.isDone ? "bell.fill" : "timer")
+                                .font(.system(size: 11, weight: .semibold))
+                                .foregroundStyle(timer.isDone ? .orange : .white.opacity(0.6))
+                            Text(timer.isDone ? "Done" : timer.remaining(at: context.date).timerText)
+                                .font(.system(size: 14, weight: .semibold).monospacedDigit())
+                                .foregroundStyle(timer.isDone ? .orange : .white)
+                            Spacer(minLength: 4)
+                            if !timer.isDone {
+                                Button { store.toggle(timer.id) } label: {
+                                    Image(systemName: timer.isRunning ? "pause.fill" : "play.fill")
+                                        .font(.system(size: 10, weight: .bold))
+                                        .frame(width: 18, height: 18)
+                                }
+                                .buttonStyle(IslandButtonStyle())
+                            }
+                            Button { store.remove(timer.id) } label: {
+                                Image(systemName: "xmark")
+                                    .font(.system(size: 9, weight: .bold))
+                                    .frame(width: 18, height: 18)
+                                    .foregroundStyle(.white.opacity(0.6))
+                            }
+                            .buttonStyle(IslandButtonStyle())
+                        }
+                        .padding(.horizontal, 9)
+                        .frame(height: 26)
+                        .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.white.opacity(0.08)))
+                    }
+                }
+            }
+        }
+        .frame(maxHeight: .infinity, alignment: .top)
+        .padding(.top, 4)
+    }
+}
+
+/// Reminders to do, ticked off with a click, and a field to add one.
+private struct LightTodos: View {
+    @ObservedObject private var store = RemindersStore.shared
+    @State private var draft = ""
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 7) {
+            if store.hasAccess {
+                HStack(spacing: 7) {
+                    Image(systemName: "plus.circle")
+                        .font(.system(size: 13))
+                        .foregroundStyle(.white.opacity(0.5))
+                    NotchTextField(prompt: "New task…", text: $draft) {
+                        store.add(draft)
+                        draft = ""
+                    }
+                    .font(.system(size: 12))
+                }
+                .padding(.horizontal, 9)
+                .frame(height: 28)
+                .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.white.opacity(0.08)))
+                ForEach(store.items.prefix(3)) { item in
+                    Button { withAnimation { store.complete(item.id) } } label: {
+                        HStack(spacing: 7) {
+                            Image(systemName: "circle")
+                                .font(.system(size: 13))
+                                .foregroundStyle(Color(nsColor: item.color))
+                            Text(item.title)
+                                .font(.system(size: 12, weight: .medium))
+                                .lineLimit(1)
+                            Spacer(minLength: 0)
+                        }
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(IslandButtonStyle())
+                }
+                if store.items.isEmpty {
+                    Text("All done.")
+                        .font(.system(size: 11))
+                        .foregroundStyle(.white.opacity(0.5))
+                }
+            } else {
+                Text("Your reminders, ticked off from the notch.")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.white.opacity(0.5))
+                Button("Allow Reminders") {
+                    store.status == .notDetermined ? store.requestAccess() : store.openPrivacySettings()
+                }
+                .buttonStyle(NotchPillStyle())
+            }
+        }
+        .frame(maxHeight: .infinity, alignment: .top)
+        .padding(.top, 4)
+    }
+}
+
+/// A small grey capsule button, like Light's "Add Timer".
+private struct NotchPillStyle: ButtonStyle {
+    var compact = false
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: compact ? 11 : 12, weight: .semibold))
+            .foregroundStyle(.white)
+            .padding(.horizontal, compact ? 8 : 11)
+            .frame(height: compact ? 22 : 26)
+            .background(Capsule().fill(Color.white.opacity(configuration.isPressed ? 0.24 : 0.14)))
+            .contentShape(Capsule())
+    }
+}
+
+/// A text editor without its background. Test pictures show sample words, as they can't draw editors.
+private struct NotchTextEditor: View {
+    @Binding var text: String
+    let sample: String
+
+    var body: some View {
+        if NotchGallery.isDrawing {
+            Text(sample).frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading).padding(.horizontal, 5)
+        } else {
+            TextEditor(text: $text)
+                .scrollContentBackground(.hidden)
+                .scrollIndicators(.never)
+        }
+    }
+}
+
+/// A plain text field. Test pictures show its prompt, as they can't draw fields.
+private struct NotchTextField: View {
+    let prompt: String
+    @Binding var text: String
+    let submit: () -> Void
+
+    var body: some View {
+        if NotchGallery.isDrawing {
+            Text(prompt).foregroundStyle(.white.opacity(0.4)).frame(maxWidth: .infinity, alignment: .leading)
+        } else {
+            TextField("", text: $text, prompt: Text(prompt).foregroundStyle(.white.opacity(0.4)))
+                .textFieldStyle(.plain)
+                .onSubmit(submit)
+        }
+    }
+}
+
+private extension TimeInterval {
+    /// 3725 → "1:02:05", 125 → "2:05"
+    var timerText: String {
+        let seconds = Int(rounded(.up))
+        let (h, m, s) = (seconds / 3600, seconds / 60 % 60, seconds % 60)
+        return h > 0 ? String(format: "%d:%02d:%02d", h, m, s) : String(format: "%d:%02d", m, s)
     }
 }
 

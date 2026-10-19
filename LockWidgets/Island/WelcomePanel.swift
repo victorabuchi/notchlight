@@ -20,7 +20,7 @@ final class WelcomeController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in self?.model.licence = $0 }
             .store(in: &subscriptions)
-        model.onBuy = { NSWorkspace.shared.open(LicenseStore.checkoutURL) }
+        model.onBuy = { NSWorkspace.shared.open(URL(string: "https://notchlight.com/#plans")!) }
         model.onWebsite = { NSWorkspace.shared.open(URL(string: "https://notchlight.com/")!) }
         model.onActivate = { [weak self] in
             self?.close { NotificationCenter.default.post(name: AppDelegate.openPage, object: SettingsPage.licence) }
@@ -115,8 +115,13 @@ final class WelcomeController {
 
 extension NSPanel {
     /// A clear, borderless panel for shapes that hang from the notch, on every Space and over full-screen apps.
-    static func atNotch(level: NSWindow.Level) -> NSPanel {
-        let panel = NSPanel(contentRect: NSRect(x: 0, y: 0, width: 200, height: 40), styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
+    /// One that takes the keyboard can be typed in without Notchlight coming to the front.
+    static func atNotch(level: NSWindow.Level, takesKeyboard: Bool = false) -> NSPanel {
+        let frame = NSRect(x: 0, y: 0, width: 200, height: 40)
+        let style: NSWindow.StyleMask = [.borderless, .nonactivatingPanel]
+        let panel = takesKeyboard
+            ? KeyboardPanel(contentRect: frame, styleMask: style, backing: .buffered, defer: false)
+            : NSPanel(contentRect: frame, styleMask: style, backing: .buffered, defer: false)
         panel.isOpaque = false
         panel.backgroundColor = .clear
         panel.hasShadow = false
@@ -132,6 +137,11 @@ extension NSPanel {
         let frame = screen.frame
         setFrame(NSRect(x: frame.midX - size.width / 2, y: frame.maxY - size.height, width: size.width, height: size.height), display: true)
     }
+}
+
+/// A borderless panel that can become key, so its text fields take typing.
+final class KeyboardPanel: NSPanel {
+    override var canBecomeKey: Bool { true }
 }
 
 /// Buttons on the notch work on the first click, while another app is in front.
@@ -229,7 +239,7 @@ struct WelcomeView: View {
                     .padding(.top, 14)
                 } else {
                     Button(action: model.onBuy) {
-                        Label("Buy Notchlight", systemImage: "arrow.up.right")
+                        Label("Choose a Plan", systemImage: "arrow.up.right")
                             .frame(width: 196)
                     }
                     .buttonStyle(WelcomeButtonStyle(prominent: true))
@@ -271,7 +281,7 @@ struct WelcomeView: View {
 
     private static let tips: [(symbol: String, text: String)] = [
         ("cursorarrow.rays", "Point at the island for the song, its lyrics and controls."),
-        ("cursorarrow.click.2", "Click the notch to open Light: your music, a mirror and the Tray."),
+        ("cursorarrow.click.2", "Click the notch for Light: music, calendar, notes, timers and to-dos."),
         ("lock.laptopcomputer", "Press ⌃⌘Q to lock your Mac and see your widgets."),
         ("rectangle.3.group", "Arrange your widgets in Layout Studio, from the menu bar."),
     ]
@@ -305,7 +315,7 @@ struct WelcomeView: View {
                     Button(action: model.onStart) { Label("Get Started", systemImage: "arrow.right") }
                         .buttonStyle(WelcomeButtonStyle(prominent: true))
                 } else {
-                    Button(action: model.onBuy) { Label("Buy Notchlight", systemImage: "arrow.up.right") }
+                    Button(action: model.onBuy) { Label("Choose a Plan", systemImage: "arrow.up.right") }
                         .buttonStyle(WelcomeButtonStyle(prominent: true))
                     if case let .trial(daysLeft) = model.licence {
                         Button(action: model.onStart) {

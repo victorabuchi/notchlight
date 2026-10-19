@@ -45,6 +45,25 @@ final class RemindersStore: ObservableObject {
         NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Reminders")!)
     }
 
+    /// Adds a reminder to the default list, from Light's to-dos.
+    func add(_ title: String) {
+        let title = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard hasAccess, !title.isEmpty, let list = store.defaultCalendarForNewReminders() else { return }
+        let reminder = EKReminder(eventStore: store)
+        reminder.title = title
+        reminder.calendar = list
+        try? store.save(reminder, commit: true)
+        reload()
+    }
+
+    /// Ticks a reminder off.
+    func complete(_ id: String) {
+        items.removeAll { $0.id == id }
+        guard let reminder = store.calendarItem(withIdentifier: id) as? EKReminder else { return }
+        reminder.isCompleted = true
+        try? store.save(reminder, commit: true)
+    }
+
     func reload() {
         status = EKEventStore.authorizationStatus(for: .reminder)
         guard hasAccess else {

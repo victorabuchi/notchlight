@@ -1,18 +1,28 @@
-#if DEBUG
 import AppKit
 import SwiftUI
+
+#if !DEBUG
+enum NotchGallery {
+    static let isDrawing = false
+}
+#else
 
 /// Test builds only: draws Light, the Tray, the drop area and the welcome with sample data to PNG files, to
 /// check their design, then quits before any window or island appears. Run the test copy with
 /// `-renderNotch <folder> -gallerySamples scripts/gallery-samples -notchWall <wallpaper>`.
 enum NotchGallery {
     static let folder = UserDefaults.standard.string(forKey: "renderNotch").map { URL(fileURLWithPath: $0, isDirectory: true) }
+    /// True while drawing the pictures, so views that can't be drawn show stand-ins.
+    static var isDrawing: Bool { folder != nil }
 
     @MainActor
     static func run(into folder: URL) -> Never {
         let samples = UserDefaults.standard.string(forKey: "gallerySamples").map { URL(fileURLWithPath: $0, isDirectory: true) }
         NowPlayingStore.shared.loadSample(artwork: samples.flatMap { NSImage(contentsOf: $0.appendingPathComponent("cover.jpg")) })
         LyricsStore.shared.loadSample()
+        CalendarStore.shared.loadSample()
+        RemindersStore.shared.loadSample()
+        CountdownStore.shared.loadSample()
         let wall = UserDefaults.standard.string(forKey: "notchWall").flatMap { NSImage(contentsOfFile: $0) }
         try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         let notch = CGSize(width: 185, height: 32)
@@ -53,7 +63,7 @@ enum NotchGallery {
     @MainActor
     private static func write(_ view: some View, to url: URL, wall: NSImage?) {
         let canvas = view
-            .frame(width: 900, height: 330)
+            .frame(width: 1460, height: 300)
             .background {
                 if let wall {
                     Image(nsImage: wall).resizable().aspectRatio(contentMode: .fill)
