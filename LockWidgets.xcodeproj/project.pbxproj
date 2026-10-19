@@ -28,6 +28,7 @@
 		39E518C35F86EC2D472747C0 /* OverlayManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E99FB43B933F43756700684B /* OverlayManager.swift */; };
 		41A12F3F862D9FEE8A26AAB3 /* LicenseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7C6BDC2A9C99596CFCFE3F /* LicenseStore.swift */; };
 		4469748AF58F07A1B94D7510 /* WeatherStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AEAFD45F48CEC57D83E9622 /* WeatherStore.swift */; };
+		45AA335DADEBDC405C2FB4A8 /* WelcomePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03B8754E359A69E34B6AA4C9 /* WelcomePanel.swift */; };
 		478DAABE02E9E7F2B9A6E8A5 /* WidgetPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842E3889C5A24B2CAA914CBF /* WidgetPicker.swift */; };
 		498525240AF04CC22C138ECB /* StickyNoteWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5542B4EFD93B4AB2028DCB89 /* StickyNoteWidget.swift */; };
 		518E03FAE3F3E7B82E76716F /* BatteryMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E623E3C959D0409FB161F2BA /* BatteryMonitor.swift */; };
@@ -86,6 +87,7 @@
 
 /* Begin PBXFileReference section */
 		00FB388C82226A174F836470 /* PreferencesMigration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesMigration.swift; sourceTree = "<group>"; };
+		03B8754E359A69E34B6AA4C9 /* WelcomePanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomePanel.swift; sourceTree = "<group>"; };
 		04501F04CE05FBA71D60D282 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = wrapper.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		0B8083C3AC3D25B4F7FD8DD8 /* LockWidgets.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LockWidgets.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0BFDEB25E245827A7F447F5B /* DailyBriefWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyBriefWidget.swift; sourceTree = "<group>"; };
@@ -298,6 +300,7 @@
 				FC24D3D942A21659A1C96E66 /* NotificationIsland.swift */,
 				DD41E562DF501668F3C9B5B9 /* StatusIsland.swift */,
 				6A3F2847FFAAC98340665AFC /* TravelIsland.swift */,
+				03B8754E359A69E34B6AA4C9 /* WelcomePanel.swift */,
 			);
 			path = Island;
 			sourceTree = "<group>";
@@ -464,6 +467,7 @@
 				6E47A89FDBD2624A239D1DBD /* Updater.swift in Sources */,
 				4469748AF58F07A1B94D7510 /* WeatherStore.swift in Sources */,
 				940693083BF27989A43B197B /* WeatherWidget.swift in Sources */,
+				45AA335DADEBDC405C2FB4A8 /* WelcomePanel.swift in Sources */,
 				185BB4FA517C57C21E146968 /* WhatsNewPage.swift in Sources */,
 				A14709DBC9B2BB1E51F308F6 /* WidgetBoard.swift in Sources */,
 				08C0B975DB0E728ED761039E /* WidgetCard.swift in Sources */,

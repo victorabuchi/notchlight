@@ -79,6 +79,10 @@ struct LicensePage: View {
                     Text(message)
                 }
             }
+
+            Section {
+                Button("Show the Welcome Again") { WelcomeController.shared.show() }
+            }
         }
         .formStyle(.grouped)
     }

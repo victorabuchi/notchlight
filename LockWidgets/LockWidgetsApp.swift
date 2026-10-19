@@ -46,6 +46,8 @@ struct LockWidgetsApp: App {
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     static let openSettings = Notification.Name("LockWidgets.openSettings")
+    /// Opens settings on the page carried as the notification's object.
+    static let openPage = Notification.Name("LockWidgets.openPage")
 
     /// True when macOS started the app at login, where opening a window would be unwelcome.
     private(set) static var launchedAtLogin = false
@@ -103,7 +105,8 @@ private struct MenuBarLabel: View {
                 // When the free trial has ended, settings open on the Licence page.
                 if LicenseStore.shared.state == .expired { SettingsRouter.shared.page = .licence }
                 if !hasLaunched {
-                    openWindow(id: "setup")
+                    // The first time, "hello" from the notch; its trial button leads on to the Setup Guide.
+                    WelcomeController.shared.show()
                 } else if !AppDelegate.launchedAtLogin || LicenseStore.shared.state == .expired {
                     openWindow(id: "settings")
                 }
@@ -111,6 +114,11 @@ private struct MenuBarLabel: View {
             }
             .onReceive(NotificationCenter.default.publisher(for: AppDelegate.openSettings)) { _ in
                 openWindow(id: hasLaunched ? "settings" : "setup")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { DockPolicy.bringWindowsForward() }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: AppDelegate.openPage)) { note in
+                if let page = note.object as? SettingsPage { SettingsRouter.shared.page = page }
+                openWindow(id: "settings")
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { DockPolicy.bringWindowsForward() }
             }
     }
@@ -250,6 +258,7 @@ private struct MenuContent: View {
         Button("What's New…") { open(.whatsNew) }
         Button("Check for Updates…") { updater.checkForUpdates() }
         Menu("Help & Support") {
+            Button("Welcome to Notchlight…") { WelcomeController.shared.show() }
             Button("Setup Guide…") {
                 openWindow(id: "setup")
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { DockPolicy.bringWindowsForward() }
