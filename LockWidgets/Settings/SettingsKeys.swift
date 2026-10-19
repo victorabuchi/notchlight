@@ -37,6 +37,30 @@ enum SettingsKey {
     static let homeTimeZone = "homeTimeZone"
     static let favoriteApps = "favoriteApps"
 
+    // The notch: the island's behaviour, Light, the Tray and the drop area.
+    static let islandHoverOpens = "islandHoverOpens"
+    static let notchWidthAdjust = "notchWidthAdjust"
+    static let notchHeightAdjust = "notchHeightAdjust"
+    static let gestures = "gestures"
+    static let gestureOpenClose = "gestureOpenClose"
+    static let gestureMedia = "gestureMedia"
+    static let gestureInvert = "gestureInvert"
+    static let liquidGlass = "liquidGlass"
+    static let liquidTint = "liquidTint"
+    static let liquidClear = "liquidClear"
+    static let lightEnabled = "lightEnabled"
+    static let lightOnHover = "lightOnHover"
+    static let lightMirror = "lightMirror"
+    static let trayOpensWithFiles = "trayOpensWithFiles"
+    static let trayFiles = "trayFiles"
+    static let dropArea = "dropArea"
+    static let dropAirDrop = "dropAirDrop"
+
+    /// A switch's value, or its default before the user has touched it.
+    static func isOn(_ key: String, default value: Bool = true) -> Bool {
+        UserDefaults.standard.object(forKey: key) as? Bool ?? value
+    }
+
     /// Follows the region (°F in the US) until the user picks a unit.
     static var defaultFahrenheit: Bool { Locale.current.measurementSystem == .us }
 }

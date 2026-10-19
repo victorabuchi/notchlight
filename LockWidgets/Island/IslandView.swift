@@ -22,10 +22,38 @@ struct IslandShape: Shape {
     }
 }
 
+/// The island's black, or Liquid Glass for open cards when that's chosen. The closed island stays black, as
+/// the notch it sits in is.
+struct IslandSurface: View {
+    var bottomRadius: CGFloat
+    var glass: Bool
+    @AppStorage(SettingsKey.liquidTint) private var tint = 0.45
+    @AppStorage(SettingsKey.liquidClear) private var clear = false
+
+    var body: some View {
+        let shape = IslandShape(bottomRadius: bottomRadius)
+        ZStack {
+            if glass { glassLayer(shape) }
+            shape.fill(Color.black).opacity(glass ? 0 : 1)
+        }
+        .animation(.easeInOut(duration: 0.25), value: glass)
+    }
+
+    @ViewBuilder
+    private func glassLayer(_ shape: IslandShape) -> some View {
+        if #available(macOS 26, *) {
+            Color.clear.glassEffect((clear ? Glass.clear : Glass.regular).tint(Color.black.opacity(tint)), in: shape)
+        } else {
+            shape.fill(.ultraThinMaterial).overlay(shape.fill(Color.black.opacity(tint)))
+        }
+    }
+}
+
 struct IslandView: View {
     @ObservedObject private var model = IslandModel.shared
     @ObservedObject private var status = StatusMonitor.shared
     @AppStorage(SettingsKey.islandPrivacy) private var showsPrivacy = true
+    @AppStorage(SettingsKey.liquidGlass) private var liquid = false
 
     var body: some View {
         island(model.size)
@@ -37,8 +65,7 @@ struct IslandView: View {
 
     private func island(_ size: CGSize) -> some View {
         ZStack(alignment: .top) {
-            IslandShape(bottomRadius: model.bottomRadius)
-                .fill(Color.black)
+            IslandSurface(bottomRadius: model.bottomRadius, glass: liquid && (model.isExpanded || model.primary?.isBanner == true))
                 .frame(width: size.width, height: size.height)
             content
                 .frame(width: size.width, height: size.height, alignment: .top)

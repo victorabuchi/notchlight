@@ -8,7 +8,7 @@ import SwiftUI
 enum WidgetGallery {
     /// Where to write the pictures, from the `-renderWidgets` launch argument.
     static let folder = UserDefaults.standard.string(forKey: "renderWidgets").map { URL(fileURLWithPath: $0, isDirectory: true) }
-    static var isRendering: Bool { folder != nil }
+    static var isRendering: Bool { folder != nil || NotchGallery.folder != nil }
 
     @MainActor
     static func run(into folder: URL) -> Never {

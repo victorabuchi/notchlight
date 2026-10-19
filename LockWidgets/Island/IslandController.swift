@@ -15,14 +15,26 @@ final class IslandController {
     private var expandWork: DispatchWorkItem?
     private var holdWork: DispatchWorkItem?
     private var pressTarget: PressTarget?
+    private var lightWork: DispatchWorkItem?
+    private var swipe = SwipeTracker()
+    /// The drag pasteboard's count when a file drag last opened Light, so one drag opens it once.
+    private var lastDrag = NSPasteboard(name: .drag).changeCount
     private let canvas = CGSize(width: 760, height: 320)
 
-    private enum PressTarget { case island, bubble }
+    private enum PressTarget { case island, bubble, light }
+
+    /// Set while the welcome or Light stands in for the island at the notch, so only one shape shows there.
+    var isSuppressed = false {
+        didSet { if isSuppressed != oldValue { update() } }
+    }
 
     /// On when the setting is, and while the trial lasts or Notchlight is licensed.
     private var enabled: Bool {
-        (UserDefaults.standard.object(forKey: SettingsKey.islandEnabled) as? Bool ?? true) && LicenseStore.shared.isActive
+        SettingsKey.isOn(SettingsKey.islandEnabled) && LicenseStore.shared.isActive && !isSuppressed
     }
+
+    /// A click on the notch with nothing live in it opens Light.
+    private var lightEnabled: Bool { SettingsKey.isOn(SettingsKey.lightEnabled) && LicenseStore.shared.isActive }
 
     func start() {
         let distributed = DistributedNotificationCenter.default()
@@ -67,18 +79,30 @@ final class IslandController {
         }) {
             monitors.append(presses)
         }
+        // Two-finger swipes on the island: down opens it, up closes it, sideways changes the song.
+        if let swipes = NSEvent.addLocalMonitorForEvents(matching: .scrollWheel, handler: { [weak self] event in
+            guard let self, event.window === panel else { return event }
+            if let direction = swipe.feed(event) { swiped(direction) }
+            return nil
+        }) {
+            monitors.append(swipes)
+        }
         update()
     }
 
     /// Returns true when the press belongs to the island or its circle rather than to the open card.
     private func pressBegan() -> Bool {
         let model = IslandModel.shared
-        guard model.primary != nil else { return false }
         let point = NSEvent.mouseLocation
         if model.showsBubble, bubbleRect.insetBy(dx: -3, dy: -3).contains(point) {
             pressTarget = .bubble
             return true
         }
+        if notchIsEmpty, notchRect.insetBy(dx: -4, dy: -4).contains(point) {
+            pressTarget = .light
+            return true
+        }
+        guard model.primary != nil else { return false }
         guard !model.isExpanded, rect(model.size).insetBy(dx: -4, dy: -4).contains(point) else { return false }
         pressTarget = .island
         expandWork?.cancel()
@@ -101,6 +125,10 @@ final class IslandController {
         holdWork = nil
         guard let target = pressTarget else { return false }
         pressTarget = nil
+        if target == .light {
+            if notchRect.insetBy(dx: -8, dy: -8).contains(NSEvent.mouseLocation) { LightController.shared.open() }
+            return true
+        }
         let model = IslandModel.shared
         let area = target == .bubble ? bubbleRect : rect(model.size)
         guard area.insetBy(dx: -8, dy: -8).contains(NSEvent.mouseLocation),
@@ -151,6 +179,42 @@ final class IslandController {
         return NSRect(x: screen.frame.midX - size.width / 2, y: screen.frame.maxY - size.height, width: size.width, height: size.height)
     }
 
+    /// The notch itself, where a click opens Light while nothing live is in it.
+    private var notchRect: NSRect { rect(IslandModel.shared.notch) }
+
+    /// Light is on and the notch has nothing live in it (quiet status may wait in the circle beside it).
+    private var notchIsEmpty: Bool {
+        let model = IslandModel.shared
+        return lightEnabled && model.hasNotch && !model.isExpanded && (model.primary == nil || model.minorAlone)
+    }
+
+    private func swiped(_ direction: SwipeTracker.Direction) {
+        guard SettingsKey.isOn(SettingsKey.gestures) else { return }
+        let model = IslandModel.shared
+        switch direction {
+        case .down where SettingsKey.isOn(SettingsKey.gestureOpenClose):
+            if lightEnabled {
+                LightController.shared.open()
+            } else if model.primary?.canExpand == true {
+                model.isExpanded = true
+            }
+        case .up where SettingsKey.isOn(SettingsKey.gestureOpenClose):
+            model.isExpanded = false
+        case .left, .right:
+            Self.changeSong(direction)
+        default:
+            break
+        }
+    }
+
+    /// A sideways swipe plays the previous song (left) or the next (right), or the other way round when inverted.
+    static func changeSong(_ direction: SwipeTracker.Direction) {
+        let music = NowPlayingStore.shared
+        guard SettingsKey.isOn(SettingsKey.gestureMedia), music.track != nil else { return }
+        let next = (direction == .right) != SettingsKey.isOn(SettingsKey.gestureInvert, default: false)
+        music.send(next ? .next : .previous)
+    }
+
     /// The circle beside the island for a second live activity.
     private var bubbleRect: NSRect {
         let model = IslandModel.shared
@@ -173,15 +237,33 @@ final class IslandController {
         guard let panel, panel.isVisible else { return }
         let model = IslandModel.shared
         let pointer = NSEvent.mouseLocation
-        let inside = hoverRect.insetBy(dx: -4, dy: -4).contains(pointer) && model.primary != nil
+        let overIsland = hoverRect.insetBy(dx: -4, dy: -4).contains(pointer) && model.primary != nil
+        let overEmptyNotch = notchIsEmpty && notchRect.insetBy(dx: -4, dy: -4).contains(pointer)
+        let inside = overIsland || overEmptyNotch
+        dragArrived(at: pointer)
         // Nothing to do while the pointer rests elsewhere.
         if pointer == lastPointer, panel.ignoresMouseEvents == !inside { return }
         lastPointer = pointer
         if panel.ignoresMouseEvents != !inside { panel.ignoresMouseEvents = !inside }
-        if model.isHovering != inside { model.isHovering = inside }
+        if model.isHovering != overIsland { model.isHovering = overIsland }
+
+        // Resting the pointer on the empty notch opens Light, when that's chosen.
+        if overEmptyNotch, SettingsKey.isOn(SettingsKey.lightOnHover, default: false), pressTarget == nil {
+            if lightWork == nil {
+                let work = DispatchWorkItem { [weak self] in
+                    self?.lightWork = nil
+                    LightController.shared.open()
+                }
+                lightWork = work
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35, execute: work)
+            }
+        } else {
+            lightWork?.cancel()
+            lightWork = nil
+        }
 
         // Resting the pointer on a live activity opens its card.
-        if inside, !model.isExpanded, pressTarget == nil, model.primary?.canExpand == true {
+        if overIsland, !model.isExpanded, pressTarget == nil, model.primary?.canExpand == true, SettingsKey.isOn(SettingsKey.islandHoverOpens) {
             if expandWork == nil {
                 let work = DispatchWorkItem { [weak self] in
                     model.isExpanded = true
@@ -196,7 +278,7 @@ final class IslandController {
         }
 
         // Close the full card shortly after the pointer leaves, however much it moves meanwhile.
-        if model.isExpanded, !inside {
+        if model.isExpanded, !overIsland {
             if collapseWork == nil {
                 let work = DispatchWorkItem { [weak self] in
                     model.isExpanded = false
@@ -209,6 +291,63 @@ final class IslandController {
             collapseWork?.cancel()
             collapseWork = nil
         }
+    }
+}
+
+extension IslandController {
+    /// Files dragged to the notch open Light with places to drop them. A drag is noticed from the drag
+    /// pasteboard, which changes as each drag starts, so nothing has to watch every mouse movement.
+    fileprivate func dragArrived(at pointer: NSPoint) {
+        guard SettingsKey.isOn(SettingsKey.dropArea), lightEnabled, NSEvent.pressedMouseButtons & 1 != 0 else { return }
+        let board = NSPasteboard(name: .drag)
+        guard board.changeCount != lastDrag else { return }
+        let area = rect(IslandModel.shared.notch).insetBy(dx: -40, dy: -24)
+        guard area.contains(pointer),
+              board.canReadObject(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true])
+        else { return }
+        lastDrag = board.changeCount
+        LightController.shared.open(.tray, forDrop: true)
+    }
+}
+
+/// Turns a two-finger swipe on a trackpad into one direction, once per swipe, in the direction the fingers moved
+/// whatever the scrolling setting.
+struct SwipeTracker {
+    enum Direction { case left, right, up, down }
+
+    private var x: CGFloat = 0
+    private var y: CGFloat = 0
+    private var fired = false
+
+    mutating func feed(_ event: NSEvent) -> Direction? {
+        guard event.hasPreciseScrollingDeltas, event.momentumPhase.isEmpty else { return nil }
+        if event.phase.contains(.began) || event.phase.contains(.mayBegin) {
+            x = 0
+            y = 0
+            fired = false
+        }
+        // With natural scrolling the deltas already follow the fingers; otherwise they run the other way.
+        let sign: CGFloat = event.isDirectionInvertedFromDevice ? 1 : -1
+        x += event.scrollingDeltaX * sign
+        y += event.scrollingDeltaY * sign
+        let ended = event.phase.contains(.ended) || event.phase.contains(.cancelled)
+        defer {
+            if ended {
+                x = 0
+                y = 0
+                fired = false
+            }
+        }
+        guard !fired else { return nil }
+        if abs(x) > 50, abs(x) > abs(y) * 1.6 {
+            fired = true
+            return x > 0 ? .right : .left
+        }
+        if abs(y) > 28, abs(y) > abs(x) * 1.6 {
+            fired = true
+            return y > 0 ? .down : .up
+        }
+        return nil
     }
 }
 

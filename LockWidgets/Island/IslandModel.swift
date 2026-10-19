@@ -135,6 +135,10 @@ final class IslandModel: ObservableObject {
         .receive(on: DispatchQueue.main)
         .sink { [weak self] in self?.refresh() }
         .store(in: &subscriptions)
+        NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.updateNotch() }
+            .store(in: &subscriptions)
 
         battery.$isPluggedIn.removeDuplicates().dropFirst()
             .receive(on: DispatchQueue.main)
@@ -315,11 +319,18 @@ final class IslandModel: ObservableObject {
         if screen.safeAreaInsets.top > 0,
            let left = screen.auxiliaryTopLeftArea, let right = screen.auxiliaryTopRightArea
         {
-            hasNotch = true
-            notch = CGSize(width: screen.frame.width - left.width - right.width, height: screen.safeAreaInsets.top)
+            if !hasNotch { hasNotch = true }
+            // Nudged by the fine tune in Notch Settings, for a notch measured a little off.
+            let defaults = UserDefaults.standard
+            let measured = CGSize(
+                width: screen.frame.width - left.width - right.width + defaults.double(forKey: SettingsKey.notchWidthAdjust),
+                height: screen.safeAreaInsets.top + defaults.double(forKey: SettingsKey.notchHeightAdjust)
+            )
+            if notch != measured { notch = measured }
         } else {
-            hasNotch = false
-            notch = CGSize(width: 190, height: NSStatusBar.system.thickness)
+            if hasNotch { hasNotch = false }
+            let standIn = CGSize(width: 190, height: NSStatusBar.system.thickness)
+            if notch != standIn { notch = standIn }
         }
     }
 

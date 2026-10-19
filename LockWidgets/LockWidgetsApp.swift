@@ -9,6 +9,7 @@ struct LockWidgetsApp: App {
     init() {
         #if DEBUG
         if let folder = WidgetGallery.folder { WidgetGallery.run(into: folder) }
+        if let folder = NotchGallery.folder { NotchGallery.run(into: folder) }
         #endif
         // Before anything reads a setting.
         PreferencesMigration.run()
@@ -41,6 +42,11 @@ struct LockWidgetsApp: App {
         }
         .windowResizability(.contentSize)
         .defaultLaunchBehavior(.suppressed)
+
+        // Notch Settings: the island, Light, the Tray and gestures, with tabs along the top.
+        Settings {
+            NotchSettingsView()
+        }
     }
 }
 
@@ -48,6 +54,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     static let openSettings = Notification.Name("LockWidgets.openSettings")
     /// Opens settings on the page carried as the notification's object.
     static let openPage = Notification.Name("LockWidgets.openPage")
+    /// Opens Notch Settings, on the tab carried as the notification's object if there is one.
+    static let openNotchSettings = Notification.Name("LockWidgets.openNotchSettings")
 
     /// True when macOS started the app at login, where opening a window would be unwelcome.
     private(set) static var launchedAtLogin = false
@@ -83,6 +91,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 /// The status item icon. It renders at launch, so it also opens the first window.
 private struct MenuBarLabel: View {
     @Environment(\.openWindow) private var openWindow
+    @Environment(\.openSettings) private var openSettings
     @AppStorage(SettingsKey.hasLaunched) private var hasLaunched = false
     @State private var frame = 0
     @State private var player: Timer?
@@ -115,6 +124,11 @@ private struct MenuBarLabel: View {
             .onReceive(NotificationCenter.default.publisher(for: AppDelegate.openSettings)) { _ in
                 openWindow(id: hasLaunched ? "settings" : "setup")
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { DockPolicy.bringWindowsForward() }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: AppDelegate.openNotchSettings)) { note in
+                if let tab = note.object as? NotchTab { NotchSettingsRouter.shared.tab = tab }
+                openSettings()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { DockPolicy.update() }
             }
             .onReceive(NotificationCenter.default.publisher(for: AppDelegate.openPage)) { note in
                 if let page = note.object as? SettingsPage { SettingsRouter.shared.page = page }
@@ -218,6 +232,9 @@ private struct MenuContent: View {
 
         Button("Open Settings…") { open(.general) }
             .keyboardShortcut(",")
+        Button("Notch Settings…") {
+            NotificationCenter.default.post(name: AppDelegate.openNotchSettings, object: nil)
+        }
         Button("Open Layout Studio…") { open(.layoutStudio) }
         Button("Browse Layout Gallery…") { open(.gallery) }
         Button(showOnLockScreen ? "Hide Widgets on Lock Screen" : "Show Widgets on Lock Screen") {

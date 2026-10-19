@@ -37,6 +37,7 @@ targets:
         NSPhotoLibraryUsageDescription: Notchlight shows your favourite photos on the lock screen.
         NSBluetoothAlwaysUsageDescription: Notchlight shows when your AirPods and other Bluetooth devices connect.
         NSCalendarsFullAccessUsageDescription: Notchlight shows your upcoming events on the lock screen.
+        NSCameraUsageDescription: Notchlight shows your camera in Light's mirror when you click it, so you can check how you look before a call.
     entitlements:
       path: LockWidgets/LockWidgets.entitlements
       properties:
@@ -45,6 +46,7 @@ targets:
         com.apple.security.network.client: true
         com.apple.security.personal-information.photos-library: true
         com.apple.security.automation.apple-events: true
+        com.apple.security.device.camera: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.victorabuchi.LockWidgets

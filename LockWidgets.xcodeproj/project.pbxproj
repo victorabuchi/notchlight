@@ -28,6 +28,7 @@
 		39E518C35F86EC2D472747C0 /* OverlayManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E99FB43B933F43756700684B /* OverlayManager.swift */; };
 		41A12F3F862D9FEE8A26AAB3 /* LicenseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7C6BDC2A9C99596CFCFE3F /* LicenseStore.swift */; };
 		4469748AF58F07A1B94D7510 /* WeatherStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AEAFD45F48CEC57D83E9622 /* WeatherStore.swift */; };
+		44844AB9BD210F1AB3A92057 /* LightPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A143A92814968DA295379816 /* LightPanel.swift */; };
 		45AA335DADEBDC405C2FB4A8 /* WelcomePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03B8754E359A69E34B6AA4C9 /* WelcomePanel.swift */; };
 		478DAABE02E9E7F2B9A6E8A5 /* WidgetPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842E3889C5A24B2CAA914CBF /* WidgetPicker.swift */; };
 		498525240AF04CC22C138ECB /* StickyNoteWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5542B4EFD93B4AB2028DCB89 /* StickyNoteWidget.swift */; };
@@ -47,6 +48,7 @@
 		7ACEECE3847CAC6E737786F1 /* StickyNotesPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2F49A7E02926DB1B13364F2 /* StickyNotesPage.swift */; };
 		7D0EA2DAADFCC5EF81F6BBC9 /* LocationWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA558E33214FD867D2DF7B02 /* LocationWidget.swift */; };
 		848A0F7F138D642A113F0891 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 51EB5C45A1B142D59D5D7BAF /* Assets.xcassets */; };
+		876370CF8FC3469071F497E7 /* NotchGallery.swift in Sources */ = {isa = PBXBuildFile; fileRef = C834DA29985A43B9B98C9653 /* NotchGallery.swift */; };
 		8D262F672AFDF5555030358B /* NowPlayingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D7B8609BD101B905C97D79E /* NowPlayingStore.swift */; };
 		8ED415FD3D294BDB2F965D38 /* NowPlayingWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A209049BBDD0B85446B892D3 /* NowPlayingWidget.swift */; };
 		8EE9ADA9CB9906AF5DEE5112 /* LayoutGalleryPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E9C717EC3548B411BFD11C /* LayoutGalleryPage.swift */; };
@@ -67,6 +69,7 @@
 		B68A0FFCD5CEFAEFE740A663 /* PhotosStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0898E2431D9B5E4809FB335 /* PhotosStore.swift */; };
 		BD7B74DF67C7A002BCB21FFB /* SkyLightWindow in Frameworks */ = {isa = PBXBuildFile; productRef = 971F8C6EB6525354011681E8 /* SkyLightWindow */; };
 		C2C478E31A770DC83E86961D /* LayoutStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62CEFE7F9ABFBC92793B4690 /* LayoutStore.swift */; };
+		C4D9C865B3BDEADC9E9E52F4 /* NotchSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2DC02F0682B95A701A2BD75 /* NotchSettings.swift */; };
 		CD51DB4356E8C25BAA8591CB /* StatusMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D20AD676D5BD191B77CCEB /* StatusMonitor.swift */; };
 		D0C46BF718881EBD91F7D12D /* DeviceMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA65EB68D63BB068EC166544 /* DeviceMonitor.swift */; };
 		D417ACA068205ED0057E2E52 /* LyricsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF728633E3B7B9FEAFF17FB5 /* LyricsWidget.swift */; };
@@ -132,6 +135,7 @@
 		9BBF42D293790175EB80BFB2 /* AlertIsland.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertIsland.swift; sourceTree = "<group>"; };
 		9CEEB090E45CA7FF69F7BD22 /* FavoritesWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesWidget.swift; sourceTree = "<group>"; };
 		A0898E2431D9B5E4809FB335 /* PhotosStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotosStore.swift; sourceTree = "<group>"; };
+		A143A92814968DA295379816 /* LightPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightPanel.swift; sourceTree = "<group>"; };
 		A209049BBDD0B85446B892D3 /* NowPlayingWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingWidget.swift; sourceTree = "<group>"; };
 		A78DAF013E95E14A143A0322 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		A84B8C12897A8C598ADF01B7 /* WhatsNewPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhatsNewPage.swift; sourceTree = "<group>"; };
@@ -144,6 +148,7 @@
 		C166765275AD20B49E4DCDBE /* WeatherWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherWidget.swift; sourceTree = "<group>"; };
 		C6C4166E066E91470CCA71C3 /* RemindersStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersStore.swift; sourceTree = "<group>"; };
 		C7E9C717EC3548B411BFD11C /* LayoutGalleryPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutGalleryPage.swift; sourceTree = "<group>"; };
+		C834DA29985A43B9B98C9653 /* NotchGallery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchGallery.swift; sourceTree = "<group>"; };
 		C9AAAA360547CF8D413C11A2 /* LicensePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicensePage.swift; sourceTree = "<group>"; };
 		CA558E33214FD867D2DF7B02 /* LocationWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationWidget.swift; sourceTree = "<group>"; };
 		CA65EB68D63BB068EC166544 /* DeviceMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceMonitor.swift; sourceTree = "<group>"; };
@@ -160,6 +165,7 @@
 		EB0DD8D79FA0BF7238001897 /* LyricsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsStore.swift; sourceTree = "<group>"; };
 		ECCAE2E92BCBB1A729F1F6F3 /* WidgetGallery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetGallery.swift; sourceTree = "<group>"; };
 		F29FB9B3C2BB81FB3C713EB3 /* GeneralPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralPage.swift; sourceTree = "<group>"; };
+		F2DC02F0682B95A701A2BD75 /* NotchSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchSettings.swift; sourceTree = "<group>"; };
 		F2F49A7E02926DB1B13364F2 /* StickyNotesPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StickyNotesPage.swift; sourceTree = "<group>"; };
 		F88EF4BD9D335A452A827616 /* WidgetPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetPage.swift; sourceTree = "<group>"; };
 		FC24D3D942A21659A1C96E66 /* NotificationIsland.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationIsland.swift; sourceTree = "<group>"; };
@@ -296,7 +302,9 @@
 				4A756FD67E8F8AAAA942CB1B /* IslandController.swift */,
 				23D896622CD53F80E294F62C /* IslandModel.swift */,
 				E76A8A810247D9D17F9128BA /* IslandView.swift */,
+				A143A92814968DA295379816 /* LightPanel.swift */,
 				C072D9FA5183B596ABFBA02B /* MusicIsland.swift */,
+				C834DA29985A43B9B98C9653 /* NotchGallery.swift */,
 				FC24D3D942A21659A1C96E66 /* NotificationIsland.swift */,
 				DD41E562DF501668F3C9B5B9 /* StatusIsland.swift */,
 				6A3F2847FFAAC98340665AFC /* TravelIsland.swift */,
@@ -315,6 +323,7 @@
 				C7E9C717EC3548B411BFD11C /* LayoutGalleryPage.swift */,
 				340B9D05531D1298D3305788 /* LayoutStudioPage.swift */,
 				C9AAAA360547CF8D413C11A2 /* LicensePage.swift */,
+				F2DC02F0682B95A701A2BD75 /* NotchSettings.swift */,
 				8314A5D52CFB7C8C3DC10023 /* SettingsKeys.swift */,
 				3A520B6BC02944014CAB7788 /* SettingsWindow.swift */,
 				E1A65F02971426C626E09C01 /* SetupGuide.swift */,
@@ -431,6 +440,7 @@
 				52690D0AE034DEDF3E3D8D2E /* LayoutStudioPage.swift in Sources */,
 				007B769D2FD82A244D199DDB /* LicensePage.swift in Sources */,
 				41A12F3F862D9FEE8A26AAB3 /* LicenseStore.swift in Sources */,
+				44844AB9BD210F1AB3A92057 /* LightPanel.swift in Sources */,
 				7D0EA2DAADFCC5EF81F6BBC9 /* LocationWidget.swift in Sources */,
 				F8E78ABA08C2E9397CD0F450 /* LockWidgetsApp.swift in Sources */,
 				072FDD1EE9F246E5C7BCEC61 /* LyricsStore.swift in Sources */,
@@ -439,6 +449,8 @@
 				335CE3A0681CDE1F2155F3D5 /* MusicIsland.swift in Sources */,
 				32752994212DB888A0358D54 /* NewsStore.swift in Sources */,
 				FDCBF09357F365705EEB40C7 /* NewsWidget.swift in Sources */,
+				876370CF8FC3469071F497E7 /* NotchGallery.swift in Sources */,
+				C4D9C865B3BDEADC9E9E52F4 /* NotchSettings.swift in Sources */,
 				348F1C0CC203B72102C2B973 /* NotificationIsland.swift in Sources */,
 				737D83A9FCB45DC03F1545DC /* NotificationStore.swift in Sources */,
 				8D262F672AFDF5555030358B /* NowPlayingStore.swift in Sources */,

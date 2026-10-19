@@ -28,6 +28,8 @@
 	<string>Notchlight reads the current song from Music and Spotify to show it on the lock screen.</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Notchlight shows when your AirPods and other Bluetooth devices connect.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Notchlight shows your camera in Light's mirror when you click it, so you can check how you look before a call.</string>
 	<key>NSCalendarsFullAccessUsageDescription</key>
 	<string>Notchlight shows your upcoming events on the lock screen.</string>
 	<key>NSLocationUsageDescription</key>

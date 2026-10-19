@@ -2,6 +2,38 @@ import SwiftUI
 
 struct IslandSettingsPage: View {
     @AppStorage(SettingsKey.islandEnabled) private var enabled = true
+
+    var body: some View {
+        Form {
+            Section {
+                PageHeader(title: "Dynamic Island", subtitle: "Live activity in your MacBook's notch, like the iPhone's Dynamic Island.")
+                PreviewStage(height: 240) {
+                    VStack(spacing: 14) {
+                        IslandPreview()
+                        Text("A song or your hotspot shows beside the notch, like the iPhone. Point at it to see more; click it to open the app.")
+                            .font(.callout)
+                            .foregroundStyle(.white.opacity(0.8))
+                    }
+                }
+            }
+            Section {
+                Toggle("Show the Dynamic Island", isOn: $enabled)
+            }
+            Section {
+                Button("Open Notch Settings…") {
+                    NotificationCenter.default.post(name: AppDelegate.openNotchSettings, object: nil)
+                }
+            } footer: {
+                Text("Light, the Tray, gestures and Liquid Glass.")
+            }
+            IslandActivitySettings()
+        }
+        .formStyle(.grouped)
+    }
+}
+
+/// Notifications and every live activity's switch, on the Dynamic Island page and in Notch Settings.
+struct IslandActivitySettings: View {
     @AppStorage(SettingsKey.islandMusic) private var music = true
     @AppStorage(SettingsKey.islandLyrics) private var lyrics = true
     @AppStorage(SettingsKey.islandMeetings) private var meetings = true
@@ -22,21 +54,6 @@ struct IslandSettingsPage: View {
     @ObservedObject private var notificationStore = NotificationStore.shared
 
     var body: some View {
-        Form {
-            Section {
-                PageHeader(title: "Dynamic Island", subtitle: "Live activity in your MacBook's notch, like the iPhone's Dynamic Island.")
-                PreviewStage(height: 240) {
-                    VStack(spacing: 14) {
-                        IslandPreview()
-                        Text("A song or your hotspot shows beside the notch, like the iPhone. Point at it to see more; click it to open the app.")
-                            .font(.callout)
-                            .foregroundStyle(.white.opacity(0.8))
-                    }
-                }
-            }
-            Section {
-                Toggle("Show the Dynamic Island", isOn: $enabled)
-            }
             Section {
                 Toggle(isOn: $notifications) {
                     Text("Notifications")
@@ -132,8 +149,6 @@ struct IslandSettingsPage: View {
                 Text("When two things are live, the second waits in its own circle on the right, like the iPhone. Calls come first, then timers, trips and music. The hotspot, to-dos and home time wait in the circle when nothing else is live.")
                     .foregroundStyle(.secondary)
             }
-        }
-        .formStyle(.grouped)
     }
 }
 

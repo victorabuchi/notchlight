@@ -5,7 +5,7 @@ import AppKit
 final class NowPlayingStore: ObservableObject {
     static let shared = NowPlayingStore()
 
-    enum Player: String {
+    enum Player: String, CaseIterable {
         case music = "com.apple.Music"
         case spotify = "com.spotify.client"
 
@@ -99,6 +99,19 @@ final class NowPlayingStore: ObservableObject {
         queue.async { [weak self] in
             var error: NSDictionary?
             NSAppleScript(source: "tell application id \"\(player.rawValue)\" to \(command.rawValue)")?.executeAndReturnError(&error)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { self?.poll() }
+        }
+    }
+
+    /// Moves the song to a point, in seconds.
+    func seek(to seconds: Double) {
+        guard let player = track?.player else { return }
+        position = seconds
+        positionDate = .now
+        objectWillChange.send()
+        queue.async { [weak self] in
+            var error: NSDictionary?
+            NSAppleScript(source: "tell application id \"\(player.rawValue)\" to set player position to \(Int(seconds))")?.executeAndReturnError(&error)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { self?.poll() }
         }
     }
