@@ -1,3 +1,4 @@
+import PhotosUI
 import SwiftUI
 
 struct WidgetPage: View {
@@ -472,7 +473,9 @@ private struct PhotosOptions: View {
                 ForEach(PhotosStore.Source.allCases) { Text($0.title).tag($0) }
             }
             .onChange(of: source) { photos.next() }
-            if source == .folder {
+            if source == .chosen {
+                ChosenPhotosEditor()
+            } else if source == .folder {
                 LabeledContent("Folder") {
                     HStack {
                         Text(photos.folderName ?? "None chosen")
@@ -501,6 +504,87 @@ private struct PhotosOptions: View {
             }
         } header: {
             Text("Photos")
+        }
+    }
+}
+
+/// Photos you choose for the Photos widget, from your library or from files, shown in the order you drag them
+/// into. One photo stays put; several take turns.
+private struct ChosenPhotosEditor: View {
+    @ObservedObject private var photos = PhotosStore.shared
+    @State private var picked: [PhotosPickerItem] = []
+
+    var body: some View {
+        LabeledContent("Your photos") {
+            HStack {
+                PhotosPicker("Add from Photos…", selection: $picked, maxSelectionCount: 50, selectionBehavior: .ordered, matching: .images)
+                Button("Add Files…") { photos.addFiles() }
+            }
+        }
+        .onChange(of: picked) { _, items in
+            guard !items.isEmpty else { return }
+            Task {
+                var images: [Data] = []
+                for item in items {
+                    if let data = try? await item.loadTransferable(type: Data.self) { images.append(data) }
+                }
+                photos.add(images)
+                picked = []
+            }
+        }
+        if photos.chosen.isEmpty {
+            Text("Choose one photo to keep on your lock screen, or several to show one after another.")
+                .foregroundStyle(.secondary)
+        } else {
+            ScrollView(.horizontal) {
+                HStack(spacing: 10) {
+                    ForEach(Array(photos.chosen.enumerated()), id: \.element.id) { index, photo in
+                        Image(nsImage: photo.thumbnail)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 72, height: 72)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .overlay(alignment: .topLeading) {
+                                Text("\(index + 1)")
+                                    .font(.caption2.weight(.bold))
+                                    .foregroundStyle(.white)
+                                    .padding(.horizontal, 5)
+                                    .padding(.vertical, 1)
+                                    .background(.black.opacity(0.55), in: Capsule())
+                                    .padding(4)
+                            }
+                            .overlay(alignment: .topTrailing) {
+                                Button { photos.remove(photo.id) } label: {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .symbolRenderingMode(.palette)
+                                        .foregroundStyle(.white, .black.opacity(0.6))
+                                }
+                                .buttonStyle(.plain)
+                                .help("Remove this photo")
+                                .padding(4)
+                            }
+                            .draggable(photo.id)
+                            .dropDestination(for: String.self) { ids, _ in
+                                guard let id = ids.first, id != photo.id else { return false }
+                                photos.move(id, before: photo.id)
+                                return true
+                            }
+                    }
+                    // Dropping past the last photo moves one to the end.
+                    Color.clear
+                        .frame(width: 44, height: 72)
+                        .contentShape(Rectangle())
+                        .dropDestination(for: String.self) { ids, _ in
+                            guard let id = ids.first else { return false }
+                            photos.move(id, before: nil)
+                            return true
+                        }
+                }
+                .padding(.vertical, 4)
+            }
+            Text(photos.chosen.count == 1 ? "This photo stays on your lock screen." : "Shown one after another in this order. Drag a photo to move it.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
         }
     }
 }

@@ -113,8 +113,10 @@ enum WidgetGallery {
 
     private static func mapsReady() -> Bool {
         guard EarthStore.shared.image != nil, let report = WeatherStore.shared.report else { return false }
-        return WidgetKind.location.styles.flatMap(\.sizes).allSatisfy {
-            MapSnapshots.shared.image(latitude: report.latitude, longitude: report.longitude, size: $0) != nil
+        return WidgetKind.location.styles.allSatisfy { style in
+            style.sizes.allSatisfy {
+                MapSnapshots.shared.image(latitude: report.latitude, longitude: report.longitude, size: $0, style: style.id) != nil
+            }
         }
     }
 

@@ -12,7 +12,7 @@ struct LocationWidget: View {
         WidgetCard(size: instance.size, padding: 0) {
             if let report = weather.report {
                 ZStack(alignment: .bottomLeading) {
-                    if let image = maps.image(latitude: report.latitude, longitude: report.longitude, size: instance.size) {
+                    if let image = maps.image(latitude: report.latitude, longitude: report.longitude, size: instance.size, style: instance.style) {
                         Image(nsImage: image)
                             .resizable()
                             .aspectRatio(contentMode: .fill)
@@ -50,18 +50,20 @@ final class MapSnapshots: ObservableObject {
     @Published private var images: [String: NSImage] = [:]
     private var pending: Set<String> = []
 
-    func image(latitude: Double, longitude: Double, size: WidgetSize) -> NSImage? {
+    /// The map in a style: "map" for Apple Maps' own look, "satellite" for photos from above, "hybrid" for
+    /// those photos with roads and place names.
+    func image(latitude: Double, longitude: Double, size: WidgetSize, style: String) -> NSImage? {
         // Rounded, so small changes in location don't redraw the map.
-        let key = String(format: "%.3f,%.3f,%@", latitude, longitude, size.rawValue)
+        let key = String(format: "%.3f,%.3f,%@,%@", latitude, longitude, size.rawValue, style)
         if let image = images[key] { return image }
         if !pending.contains(key) {
             pending.insert(key)
-            DispatchQueue.main.async { self.draw(key: key, latitude: latitude, longitude: longitude, size: size) }
+            DispatchQueue.main.async { self.draw(key: key, latitude: latitude, longitude: longitude, size: size, style: style) }
         }
         return nil
     }
 
-    private func draw(key: String, latitude: Double, longitude: Double, size: WidgetSize) {
+    private func draw(key: String, latitude: Double, longitude: Double, size: WidgetSize, style: String) {
         let points = size.points
         let options = MKMapSnapshotter.Options()
         let meters = 2400.0
@@ -71,7 +73,11 @@ final class MapSnapshots: ObservableObject {
             longitudinalMeters: meters * points.width / points.height
         )
         options.size = points
-        options.mapType = .standard
+        options.mapType = switch style {
+        case "satellite": .satellite
+        case "hybrid": .hybrid
+        default: .standard
+        }
         options.pointOfInterestFilter = .excludingAll
         MKMapSnapshotter(options: options).start { [weak self] snapshot, _ in
             guard let self else { return }

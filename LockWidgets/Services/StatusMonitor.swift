@@ -81,7 +81,7 @@ final class StatusMonitor: ObservableObject {
         }
         if next != meeting { meeting = next }
 
-        let users = listening.filter { app in !Self.backgroundListeners.contains { app.hasPrefix($0) } }
+        let users = listening.filter(Self.isVisibleApp)
         let dot: Privacy? = screenRecording ? .screenRecording
             : camera ? .camera
             : users.isEmpty ? nil : .microphone
@@ -90,6 +90,18 @@ final class StatusMonitor: ObservableObject {
 
     /// Listeners that are always on, such as "Hey Siri"; macOS shows no dot for them either.
     private static let backgroundListeners = ["com.apple.corespeechd", "com.apple.siri", "com.apple.assistantd", "com.apple.SpeechRecognitionCore"]
+
+    /// Whether a process recording from a microphone is an app you can see, or a call app's or browser's
+    /// helper, as macOS's own indicator counts it. System listeners such as Siri, Sound Recognition or Live
+    /// Captions keep the input running in the background without anything showing, so they don't count.
+    private static func isVisibleApp(_ process: String) -> Bool {
+        if backgroundListeners.contains(where: { process.hasPrefix($0) }) { return false }
+        if callApps.contains(where: { process.hasPrefix($0.bundleID) }) { return true }
+        return NSWorkspace.shared.runningApplications.contains { app in
+            guard app.activationPolicy == .regular, let id = app.bundleIdentifier else { return false }
+            return process == id || process.hasPrefix(id + ".")
+        }
+    }
 
     /// Whether anything is recording or sharing the screen. SkyLight is private, but this is the check macOS
     /// itself offers, and it covers screenshots' screen recording, QuickTime, screen sharing and meeting apps.

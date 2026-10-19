@@ -88,6 +88,8 @@ enum WidgetKind: String, Codable, CaseIterable, Identifiable {
             summary: "A map of where you are, with the name of the place.", category: .information,
             styles: [
                 WidgetStyle(id: "map", name: "Map", summary: "Your surroundings, with a dot where you are.", sizes: [.small, .medium, .wide, .large]),
+                WidgetStyle(id: "satellite", name: "Satellite", summary: "Where you are, seen from above.", sizes: [.small, .medium, .wide, .large]),
+                WidgetStyle(id: "hybrid", name: "Hybrid", summary: "Satellite photos with roads and place names.", sizes: [.small, .medium, .wide, .large]),
             ]
         )
         case .news: WidgetMeta(
@@ -122,7 +124,7 @@ enum WidgetKind: String, Codable, CaseIterable, Identifiable {
         )
         case .photos: WidgetMeta(
             title: "Photos", symbol: "photo.on.rectangle", color: .indigo,
-            summary: "Favourites from your library or a folder, changing through the day.", category: .information,
+            summary: "Favourites, a folder, or photos you choose and arrange, changing through the day.", category: .information,
             styles: [
                 WidgetStyle(id: "photo", name: "Photo", summary: "Edge to edge.", sizes: [.small, .medium, .large]),
                 WidgetStyle(id: "framed", name: "Framed", summary: "A print with a white border and the date.", sizes: [.small, .large]),
