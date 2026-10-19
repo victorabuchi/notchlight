@@ -628,6 +628,22 @@ section { padding-block: 104px; }
 .lyrics-panel p.now { color: #fff; }
 
 /* Trust. */
+/* Pricing: two cards, the one to buy and the free trial. */
+.plans { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; margin-top: 40px; }
+.plan { display: grid; gap: 14px; align-content: start; padding: 32px; border-radius: 28px; background: var(--paper); border: 1px solid var(--line); }
+.plan-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.plan h3 { font-size: 21px; font-weight: 600; }
+.plan .tag { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line-strong); border-radius: 980px; padding: 3px 10px; }
+.plan .price { color: var(--muted); font-size: 17px; }
+.plan .price b { color: var(--ink); font: 700 clamp(40px, 5vw, 52px)/1 var(--display); letter-spacing: -0.03em; margin-right: 4px; }
+.plan-note { color: var(--muted); }
+.buy.wide, .outline.wide { width: 100%; padding-block: 11px; margin-top: 4px; }
+.outline { display: inline-flex; align-items: center; justify-content: center; border-radius: 980px; border: 1px solid var(--accent); color: var(--accent); font-size: 17px; letter-spacing: -0.01em; text-decoration: none; }
+.outline:hover { background: var(--accent); color: var(--paper); }
+.plan-list-title { margin-top: 10px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--faint); }
+.plan-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.plan-list li { display: flex; gap: 10px; align-items: flex-start; color: var(--ink); font-size: 16px; }
+.plan-list svg { width: 18px; height: 18px; flex: none; margin-top: 2px; color: var(--accent); }
 .trust { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; margin-top: 40px; }
 .trust div { display: grid; gap: 8px; align-content: start; }
 .trust p { color: var(--muted); font-size: 16px; }
@@ -676,6 +692,7 @@ footer .legal { flex-basis: 100%; font-size: 13px; }
   .wgallery, .trust { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 900px) {
+  .plans { grid-template-columns: minmax(0, 1fr); }
   .showcase { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .stages { grid-column: 1 / -1; order: -1; position: static; }
   .topbar { display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto; }
@@ -725,6 +742,7 @@ footer .legal { flex-basis: 100%; font-size: 13px; }
       <a href="#layouts">Layouts</a>
       <a href="#appearance">Appearance</a>
       <a href="#music">Music</a>
+      <a href="#plans">Pricing</a>
       <a href="#faq">FAQ</a>
     </div>
     <button type="button" class="search-button" aria-label="Search Notchlight" aria-haspopup="dialog" aria-expanded="false">
@@ -1447,7 +1465,47 @@ footer .legal { flex-basis: 100%; font-size: 13px; }
     </div>
   </section>
 
-  <section id="faq" class="band">
+  <section id="plans" class="band">
+    <div class="wrap">
+      <div class="stack">
+        <span class="eyebrow">Pricing</span>
+        <h2>One price. Yours to keep.</h2>
+        <p class="lede">Try every feature free for 7 days, then buy Notchlight once to keep it on up to 3 of your Macs.</p>
+      </div>
+      <div class="plans">
+        <article class="plan">
+          <div class="plan-head"><h3>Lifetime</h3><span class="tag">Pay once</span></div>
+          <p class="price"><b>$14.99</b> one-time</p>
+          <p class="plan-note">One payment, yours to keep. No subscription.</p>
+          <a class="buy wide" href="https://buy.polar.sh/polar_cl_3kwCipamOJFV6MggVZJUPtsrjRJcMMvz8Tsok1mVmVn" data-buy>Buy Notchlight</a>
+          <p class="plan-list-title">Everything in Notchlight</p>
+          <ul class="plan-list">
+            <li><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.2" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="m4.9 8.2 2.1 2.1 4.1-4.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Live widgets on your lock screen, 21 of them</li>
+            <li><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.2" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="m4.9 8.2 2.1 2.1 4.1-4.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>The Dynamic Island: your music with its lyrics, calls, trips and more</li>
+            <li><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.2" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="m4.9 8.2 2.1 2.1 4.1-4.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Layout Studio and the Layout Gallery</li>
+            <li><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.2" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="m4.9 8.2 2.1 2.1 4.1-4.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Updates that install themselves</li>
+            <li><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.2" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="m4.9 8.2 2.1 2.1 4.1-4.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Up to 3 Macs per licence</li>
+            <li><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.2" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="m4.9 8.2 2.1 2.1 4.1-4.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>No subscription</li>
+          </ul>
+        </article>
+        <article class="plan">
+          <div class="plan-head"><h3>Free trial</h3><span class="tag">7 days</span></div>
+          <p class="price"><b>$0</b> for 7 days</p>
+          <p class="plan-note">Every feature, before you decide.</p>
+          <a class="outline wide" href="download/">Try it free</a>
+          <p class="plan-list-title">Then decide</p>
+          <ul class="plan-list">
+            <li><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.2" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="m4.9 8.2 2.1 2.1 4.1-4.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>No account or card needed</li>
+            <li><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.2" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="m4.9 8.2 2.1 2.1 4.1-4.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Signed and notarized by Apple</li>
+            <li><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.2" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="m4.9 8.2 2.1 2.1 4.1-4.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Buy any time, during the trial or after it</li>
+            <li><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.2" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="m4.9 8.2 2.1 2.1 4.1-4.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Your widgets and layouts stay when you buy</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq">
     <div class="wrap">
       <h2>Questions</h2>
       <div class="faq">
@@ -1755,6 +1813,7 @@ footer .legal { flex-basis: 100%; font-size: 13px; }
   const entries = [
     { title: "Buy Notchlight", kind: "$14.99, up to 3 Macs", href: "https://buy.polar.sh/polar_cl_3kwCipamOJFV6MggVZJUPtsrjRJcMMvz8Tsok1mVmVn", words: "buy purchase price pay licence license key" },
     { title: "Download Notchlight", kind: "For macOS 15 and later", href: "download/", words: "download dmg get mac app" },
+    { title: "Pricing", kind: "Section", href: "#plans", words: "price pricing plans cost lifetime one-time trial free buy" },
     { title: "Install", kind: "Section", href: "#install", words: "install setup steps dmg applications open" },
     { title: "Dynamic Island", kind: "Section", href: "#island", words: "notch live activities alerts island" },
     { title: "Lock screen widgets", kind: "Section", href: "#widgets", words: "widgets lock screen glance" },
