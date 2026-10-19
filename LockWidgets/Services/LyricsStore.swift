@@ -27,7 +27,11 @@ final class LyricsStore: ObservableObject {
     @Published private(set) var state = State.idle
 
     private var subscription: AnyCancellable?
-    private var retry: Timer?
+    /// Looks in Music's cache again whenever it changes, until Apple Music's lyrics turn up.
+    private var watch: Timer?
+    private var musicStamp: Date?
+    /// The lines showing are Apple Music's own, so nothing else replaces them.
+    private var fromApple = false
     private var cache: [String: [Line]] = [:]
     /// LRCLIB's lines for the current song, while Apple Music's may still arrive.
     private var fallback: Task<Void, Never>?
@@ -54,8 +58,9 @@ final class LyricsStore: ObservableObject {
     }
 
     private func load(_ track: NowPlayingStore.Track?) {
-        retry?.invalidate()
+        watch?.invalidate()
         fallback?.cancel()
+        fromApple = false
         guard let track else {
             lines = []
             state = .idle
@@ -71,22 +76,37 @@ final class LyricsStore: ObservableObject {
         state = .loading
         guard track.player == .music else {
             // Spotify has no Apple Music lyrics to wait for.
-            askLRCLib(track, key: key, finalAnswer: true)
+            askLRCLib(track, key: key, after: 0)
             return
         }
-        attempt(track, key: key, remaining: 10)
+        // Music fetches a song's lyrics when it shows them, which may be well into the song, so look now,
+        // ask LRCLIB in case Music never does, and look again each time Music's cache changes.
+        lookInMusic(track, key: key)
+        askLRCLib(track, key: key, after: 2.5)
+        musicStamp = AppleMusicLyrics.cacheChanged
+        watch = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] timer in
+            guard let self, NowPlayingStore.shared.track?.id == key, !fromApple else {
+                timer.invalidate()
+                return
+            }
+            let changed = AppleMusicLyrics.cacheChanged
+            guard changed != musicStamp else { return }
+            musicStamp = changed
+            lookInMusic(track, key: key)
+        }
     }
 
-    /// LRCLIB's lyrics, shown unless Apple Music's are already here. When it's the last source, no lyrics
-    /// means the song has none.
-    private func askLRCLib(_ track: NowPlayingStore.Track, key: String, finalAnswer: Bool) {
+    /// LRCLIB's lyrics, shown unless Apple Music's are already here, after a moment for Music to answer first.
+    private func askLRCLib(_ track: NowPlayingStore.Track, key: String, after delay: Double) {
         fallback = Task { [weak self] in
+            if delay > 0 { try? await Task.sleep(for: .seconds(delay)) }
+            guard !Task.isCancelled else { return }
             let found = await LRCLib.lyrics(for: track)
             await MainActor.run {
-                guard let self, !Task.isCancelled, NowPlayingStore.shared.track?.id == key, self.state != .found else { return }
+                guard let self, !Task.isCancelled, NowPlayingStore.shared.track?.id == key, !self.fromApple else { return }
                 if let found {
                     self.show(found, key: key, keep: false)
-                } else if finalAnswer {
+                } else if self.state != .found {
                     self.state = .unavailable
                 }
             }
@@ -101,25 +121,16 @@ final class LyricsStore: ObservableObject {
         state = .found
     }
 
-    /// Music fetches lyrics a moment after a song starts, so look a few times before giving up.
-    private func attempt(_ track: NowPlayingStore.Track, key: String, remaining: Int) {
+    /// Apple Music's own lyrics from Music's cache. They win, even over LRCLIB's already showing.
+    private func lookInMusic(_ track: NowPlayingStore.Track, key: String) {
         queue.async { [weak self] in
             let found = AppleMusicLyrics.lyrics(title: track.title, artist: track.artist, duration: track.duration)
             DispatchQueue.main.async {
-                guard let self, NowPlayingStore.shared.track?.id == key else { return }
-                if let found {
-                    // Apple Music's own lyrics win, even over LRCLIB's already showing.
-                    self.fallback?.cancel()
-                    self.show(found, key: key, keep: true)
-                } else if remaining > 0 {
-                    // After the first look, ask LRCLIB too, in case Music never fetches any.
-                    if remaining == 9 { self.askLRCLib(track, key: key, finalAnswer: false) }
-                    self.retry = Timer.scheduledTimer(withTimeInterval: 2, repeats: false) { _ in
-                        self.attempt(track, key: key, remaining: remaining - 1)
-                    }
-                } else if self.state != .found {
-                    self.state = .unavailable
-                }
+                guard let self, let found, NowPlayingStore.shared.track?.id == key, !self.fromApple else { return }
+                self.fromApple = true
+                self.fallback?.cancel()
+                self.watch?.invalidate()
+                self.show(found, key: key, keep: true)
             }
         }
     }

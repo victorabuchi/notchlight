@@ -64,6 +64,9 @@ final class NowPlayingStore: ObservableObject {
     private var position: Double = 0
     private var positionDate = Date()
     private var timer: Timer?
+    /// Looks for a streamed song's artwork again whenever Music's cache changes, until it's found.
+    private var artworkWatch: Timer?
+    private var artworkStamp: Date?
     private let queue = DispatchQueue(label: "LockWidgets.NowPlaying")
 
     private init() {
@@ -216,27 +219,40 @@ final class NowPlayingStore: ObservableObject {
                 DispatchQueue.main.async { if self?.track?.id == id { self?.artwork = image } }
             } else {
                 // Songs streamed from Apple Music have no artwork of their own in Music's library.
-                self?.loadCatalogueArtwork(for: track, attempt: 0)
+                DispatchQueue.main.async { self?.findCatalogueArtwork(for: track) }
             }
         }
     }
 
-    /// Fetches a streamed song's artwork from Apple, by the link in Music's cached catalogue entry, trying
-    /// again for a little while if Music hasn't cached the entry yet.
-    private func loadCatalogueArtwork(for track: Track, attempt: Int) {
-        guard let url = AppleMusicLyrics.artworkURL(title: track.title, duration: track.duration) else {
-            // Music caches a song's catalogue entry only with its lyrics, so songs without lyrics may never
-            // have one; Apple's catalogue search finds most of those.
-            if attempt == 0 { searchArtwork(for: track) }
-            if attempt < 5 {
-                queue.asyncAfter(deadline: .now() + 2) { [weak self] in self?.loadCatalogueArtwork(for: track, attempt: attempt + 1) }
+    /// A streamed song's artwork, by the link in Music's cached catalogue entry. Music caches the entry along
+    /// with the song's lyrics, which it may fetch well into the song (when its lyrics are shown), so look
+    /// again each time Music's cache changes, for as long as the song plays without artwork. Apple's catalogue
+    /// search covers songs Music never caches.
+    private func findCatalogueArtwork(for track: Track) {
+        searchArtwork(for: track)
+        lookInCatalogue(track)
+        artworkWatch?.invalidate()
+        artworkStamp = AppleMusicLyrics.cacheChanged
+        artworkWatch = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] timer in
+            guard let self, self.track?.id == track.id, artwork == nil else {
+                timer.invalidate()
+                return
             }
-            return
+            let changed = AppleMusicLyrics.cacheChanged
+            guard changed != artworkStamp else { return }
+            artworkStamp = changed
+            lookInCatalogue(track)
         }
-        URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
-            guard let data, let image = NSImage(data: data) else { return }
-            DispatchQueue.main.async { if self?.track?.id == track.id { self?.artwork = image } }
-        }.resume()
+    }
+
+    private func lookInCatalogue(_ track: Track) {
+        queue.async { [weak self] in
+            guard let url = AppleMusicLyrics.artworkURL(title: track.title, duration: track.duration) else { return }
+            URLSession.shared.dataTask(with: url) { data, _, _ in
+                guard let data, let image = NSImage(data: data) else { return }
+                DispatchQueue.main.async { if self?.track?.id == track.id { self?.artwork = image } }
+            }.resume()
+        }
     }
 }
 

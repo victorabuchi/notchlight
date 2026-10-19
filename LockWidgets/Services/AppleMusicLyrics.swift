@@ -15,6 +15,14 @@ enum AppleMusicLyrics {
         FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Caches/com.apple.Music")
     }
 
+    /// When Music's cache last changed, from its files' dates: a cheap check of whether looking again could
+    /// find something new.
+    static var cacheChanged: Date? {
+        ["Cache.db", "Cache.db-wal"]
+            .compactMap { (try? FileManager.default.attributesOfItem(atPath: cacheFolder.appendingPathComponent($0).path))?[.modificationDate] as? Date }
+            .max()
+    }
+
     /// Lyrics for a track, matched by title and length. nil when Music hasn't cached any.
     static func lyrics(title: String, artist _: String, duration: Double) -> [Line]? {
         for response in cachedResponses() {
