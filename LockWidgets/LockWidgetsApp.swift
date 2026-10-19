@@ -44,9 +44,11 @@ struct LockWidgetsApp: App {
         .defaultLaunchBehavior(.suppressed)
 
         // Notch Settings: the island, Light, the Tray and gestures, with tabs along the top.
-        Settings {
+        Window("Notch Settings", id: "notch") {
             NotchSettingsView()
         }
+        .defaultSize(width: 720, height: 600)
+        .defaultLaunchBehavior(.suppressed)
     }
 }
 
@@ -91,7 +93,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 /// The status item icon. It renders at launch, so it also opens the first window.
 private struct MenuBarLabel: View {
     @Environment(\.openWindow) private var openWindow
-    @Environment(\.openSettings) private var openSettings
     @AppStorage(SettingsKey.hasLaunched) private var hasLaunched = false
     @State private var frame = 0
     @State private var player: Timer?
@@ -127,8 +128,8 @@ private struct MenuBarLabel: View {
             }
             .onReceive(NotificationCenter.default.publisher(for: AppDelegate.openNotchSettings)) { note in
                 if let tab = note.object as? NotchTab { NotchSettingsRouter.shared.tab = tab }
-                openSettings()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { DockPolicy.update() }
+                openWindow(id: "notch")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { DockPolicy.bringWindowsForward() }
             }
             .onReceive(NotificationCenter.default.publisher(for: AppDelegate.openPage)) { note in
                 if let page = note.object as? SettingsPage { SettingsRouter.shared.page = page }

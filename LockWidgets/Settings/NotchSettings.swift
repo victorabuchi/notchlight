@@ -7,52 +7,107 @@ final class NotchSettingsRouter: ObservableObject {
     @Published var tab: NotchTab = .general
 }
 
-enum NotchTab: Hashable {
+enum NotchTab: CaseIterable, Hashable {
     case general, liquid, gestures, activities, light, tray, dropArea, licence, about
+
+    var title: String {
+        switch self {
+        case .general: "General"
+        case .liquid: "Liquid"
+        case .gestures: "Gestures"
+        case .activities: "Live Activities"
+        case .light: "Light"
+        case .tray: "Tray"
+        case .dropArea: "Drop Area"
+        case .licence: "Licence"
+        case .about: "About"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .general: "gearshape.fill"
+        case .liquid: "drop.fill"
+        case .gestures: "hand.point.up.left.fill"
+        case .activities: "dot.radiowaves.left.and.right"
+        case .light: "lamp.desk.fill"
+        case .tray: "tray.fill"
+        case .dropArea: "square.on.square.dashed"
+        case .licence: "key.horizontal.fill"
+        case .about: "ellipsis.circle.fill"
+        }
+    }
 }
 
-/// The notch's own settings window, with its tabs along the top as macOS settings windows have them: the
-/// island's behaviour, Liquid Glass, gestures, live activities, Light, the Tray, the drop area, the licence.
+/// The notch's own settings, with its tabs along the top as macOS settings windows have them: the island's
+/// behaviour, Liquid Glass, gestures, live activities, Light, the Tray, the drop area, the licence. It is its
+/// own window (from Light's gear and the menu bar) and the Notch page in Settings.
 struct NotchSettingsView: View {
+    /// Inside the Settings window, rather than its own.
+    var embedded = false
     @ObservedObject private var router = NotchSettingsRouter.shared
 
     var body: some View {
-        TabView(selection: $router.tab) {
-            NotchGeneralTab()
-                .tabItem { Label("General", systemImage: "gearshape.fill") }
-                .tag(NotchTab.general)
-            LiquidTab()
-                .tabItem { Label("Liquid", systemImage: "drop.fill") }
-                .tag(NotchTab.liquid)
-            GesturesTab()
-                .tabItem { Label("Gestures", systemImage: "hand.point.up.left.fill") }
-                .tag(NotchTab.gestures)
-            Form { IslandActivitySettings() }
-                .formStyle(.grouped)
-                .frame(height: 560)
-                .tabItem { Label("Live Activities", systemImage: "dot.radiowaves.left.and.right") }
-                .tag(NotchTab.activities)
-            LightTab()
-                .tabItem { Label("Light", systemImage: "lamp.desk.fill") }
-                .tag(NotchTab.light)
-            TrayTab()
-                .tabItem { Label("Tray", systemImage: "tray.fill") }
-                .tag(NotchTab.tray)
-            DropAreaTab()
-                .tabItem { Label("Drop Area", systemImage: "square.on.square.dashed") }
-                .tag(NotchTab.dropArea)
-            LicensePage(showsHeader: false)
-                .frame(height: 560)
-                .tabItem { Label("Licence", systemImage: "key.horizontal.fill") }
-                .tag(NotchTab.licence)
-            AboutPage()
-                .frame(height: 330)
-                .tabItem { Label("About", systemImage: "ellipsis.circle.fill") }
-                .tag(NotchTab.about)
+        VStack(spacing: 0) {
+            NotchTabBar(selection: $router.tab)
+            Divider()
+            Group {
+                switch router.tab {
+                case .general: ScrollView { NotchGeneralTab() }
+                case .liquid: ScrollView { LiquidTab() }
+                case .gestures: ScrollView { GesturesTab() }
+                case .activities: Form { IslandActivitySettings() }.formStyle(.grouped)
+                case .light: ScrollView { LightTab() }
+                case .tray: ScrollView { TrayTab() }
+                case .dropArea: ScrollView { DropAreaTab() }
+                case .licence: LicensePage(showsHeader: false)
+                case .about: AboutPage()
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
-        .frame(width: 660)
-        .onAppear { DockPolicy.update() }
-        .onDisappear { DockPolicy.update() }
+        .frame(minWidth: 660, minHeight: 440)
+        .navigationTitle(embedded ? "Notch" : router.tab.title)
+        .onAppear { if !embedded { DockPolicy.update() } }
+        .onDisappear { if !embedded { DockPolicy.update() } }
+    }
+}
+
+/// Icons over their names, the selected one tinted and set on a soft tile, like a settings window's toolbar.
+private struct NotchTabBar: View {
+    @Binding var selection: NotchTab
+
+    var body: some View {
+        HStack(spacing: 2) {
+            ForEach(NotchTab.allCases, id: \.self) { tab in
+                let selected = selection == tab
+                Button { selection = tab } label: {
+                    VStack(spacing: 3) {
+                        Image(systemName: tab.symbol)
+                            .font(.system(size: 19, weight: .medium))
+                            .frame(height: 24)
+                        Text(tab.title)
+                            .font(.system(size: 12))
+                            .lineLimit(1)
+                            .fixedSize()
+                    }
+                    .foregroundStyle(selected ? Color.accentColor : Color.secondary)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 6)
+                    .background {
+                        if selected {
+                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                .fill(Color.primary.opacity(0.07))
+                        }
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(selected ? .isSelected : [])
+            }
+        }
+        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity)
     }
 }
 

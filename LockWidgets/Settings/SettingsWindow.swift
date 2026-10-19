@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum SettingsPage: Hashable {
-    case general, whatsNew, licence, layoutStudio, gallery, appearance, stickyNotes, island, about
+    case general, whatsNew, licence, layoutStudio, gallery, appearance, stickyNotes, island, notch, about
     case widget(WidgetKind)
 
     #if DEBUG
@@ -9,7 +9,7 @@ enum SettingsPage: Hashable {
     static var launchPage: SettingsPage? {
         guard let name = UserDefaults.standard.string(forKey: "settingsPage") else { return nil }
         if let kind = WidgetKind(rawValue: name) { return .widget(kind) }
-        return ["general": .general, "whatsnew": .whatsNew, "licence": .licence, "studio": .layoutStudio, "gallery": .gallery, "appearance": .appearance, "notes": .stickyNotes, "island": .island, "about": .about][name]
+        return ["general": .general, "whatsnew": .whatsNew, "licence": .licence, "studio": .layoutStudio, "gallery": .gallery, "appearance": .appearance, "notes": .stickyNotes, "island": .island, "notch": .notch, "about": .about][name]
     }
     #endif
 }
@@ -48,6 +48,8 @@ struct SettingsWindow: View {
                 Section("Desktop") {
                     SidebarRow(title: "Dynamic Island", symbol: "capsule.fill", color: .black)
                         .tag(SettingsPage.island)
+                    SidebarRow(title: "Notch", symbol: "macbook", color: .blue)
+                        .tag(SettingsPage.notch)
                 }
 
                 Section("Widget Settings") {
@@ -73,6 +75,7 @@ struct SettingsWindow: View {
             case .appearance: AppearancePage()
             case .stickyNotes: StickyNotesPage()
             case .island: IslandSettingsPage()
+            case .notch: NotchSettingsView(embedded: true)
             case .about: AboutPage()
             case let .widget(kind): WidgetPage(kind: kind)
             }

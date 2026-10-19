@@ -20,9 +20,7 @@ struct IslandSettingsPage: View {
                 Toggle("Show the Dynamic Island", isOn: $enabled)
             }
             Section {
-                Button("Open Notch Settings…") {
-                    NotificationCenter.default.post(name: AppDelegate.openNotchSettings, object: nil)
-                }
+                Button("Open Notch Settings…") { SettingsRouter.shared.page = .notch }
             } footer: {
                 Text("Light, the Tray, gestures and Liquid Glass.")
             }
