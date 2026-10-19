@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Downloading Notchlight</title>
+<meta name="description" content="Your Notchlight download is starting. How to open it the first time, what to try first, and how the 7-day free trial works.">
+<link rel="canonical" href="https://notchlight.com/download/">
+<link rel="icon" href="../assets/icon-64.png?v=2">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+<style>
+/* The page after Download: the file starts on its own, and the page explains the first launch, what to try first
+   and the trial, in the website's own look. */
+:root {
+  --paper: #ffffff;
+  --paper-2: #f5f5f7;
+  --tile: #f5f5f7;
+  /* Cards that sit on a grey band. */
+  --raised: #ffffff;
+  --ink: #1d1d1f;
+  --muted: #56565c;
+  --faint: #86868b;
+  --line: rgba(0, 0, 0, 0.08);
+  --bar: rgba(255, 255, 255, 0.82);
+  --accent: #0066cc;
+  --button: #0071e3;
+  --button-hover: #0077ed;
+  --on-button: #ffffff;
+  --shot: #0b0b0f;
+  /* Which take of each picture shows, and the wallpaper behind the widget. */
+  --light-take: block;
+  --dark-take: none;
+  --try-wall: url("../assets/walls/macos-light.webp?v=2");
+  --app-icon: url("../assets/icon.png?v=2");
+  --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --body: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --paper: #000000; --paper-2: #101012; --tile: #1d1d1f; --raised: #1d1d1f; --ink: #f5f5f7; --muted: #a1a1a6; --faint: #7c7c82; --line: rgba(255, 255, 255, 0.1); --bar: rgba(22, 22, 23, 0.8); --accent: #2997ff; --app-icon: url("../assets/icon-dark.png?v=2"); --light-take: none; --dark-take: block; --try-wall: url("../assets/walls/macos-dark.webp?v=2"); color-scheme: dark; }
+}
+:root[data-theme="dark"] { --paper: #000000; --paper-2: #101012; --tile: #1d1d1f; --raised: #1d1d1f; --ink: #f5f5f7; --muted: #a1a1a6; --faint: #7c7c82; --line: rgba(255, 255, 255, 0.1); --bar: rgba(22, 22, 23, 0.8); --accent: #2997ff; --app-icon: url("../assets/icon-dark.png?v=2"); --light-take: none; --dark-take: block; --try-wall: url("../assets/walls/macos-dark.webp?v=2"); color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.55 var(--body); -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+img { max-width: 100%; display: block; }
+h1, h2, h3 { margin: 0; font-family: var(--display); letter-spacing: -0.022em; line-height: 1.08; text-wrap: balance; }
+p { margin: 0; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 2; background: var(--bar); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid var(--line); }
+.topbar { display: flex; align-items: center; justify-content: space-between; min-height: 52px; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+.brand { display: flex; align-items: center; gap: 9px; color: var(--ink); font: 600 19px var(--display); letter-spacing: -0.02em; }
+.brand:hover, .buy:hover { text-decoration: none; }
+.app-icon { display: block; flex: none; width: 26px; height: 26px; background: var(--app-icon) center / contain no-repeat; }
+.buy { display: inline-flex; align-items: center; border-radius: 980px; background: var(--button); color: var(--on-button); font-size: 17px; letter-spacing: -0.01em; padding: 8px 18px; white-space: nowrap; }
+.buy:hover { background: var(--button-hover); }
+.bar .buy { font-size: 12px; padding: 4px 11px; }
+.eyebrow { color: var(--muted); font-size: 19px; font-weight: 600; letter-spacing: -0.012em; }
+.lede { color: var(--muted); font-size: clamp(17px, 1.6vw, 21px); max-width: 60ch; }
+section { padding-block: 72px; }
+.band { background: var(--paper-2); }
+
+/* The download starting, and the button if it didn't. */
+.start { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 48px; align-items: center; }
+.start .head { display: grid; gap: 18px; }
+.start h1 { font-size: clamp(44px, 6vw, 72px); font-weight: 700; }
+.ready { display: grid; gap: 14px; padding: 32px; border-radius: 28px; background: var(--tile); }
+.ready h2 { font-size: 28px; font-weight: 600; }
+.ready p { color: var(--muted); font-size: 16px; }
+.again { display: inline-flex; align-items: center; gap: 6px; font-size: 19px; }
+.again svg { width: 1.05em; height: 1.05em; }
+.small { color: var(--faint); font-size: 14px; }
+
+/* The first launch, step by step. */
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 34px; }
+.step { display: grid; gap: 14px; align-content: start; padding: 26px; border-radius: 22px; background: var(--raised); }
+.step b.n { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--button); color: var(--on-button); font: 600 16px var(--display); }
+.step p { color: var(--muted); }
+.step strong { color: var(--ink); font-weight: 600; }
+kbd { font: 500 14px ui-monospace, "SF Mono", Menlo, monospace; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 6px; padding: 1px 6px; background: var(--paper-2); color: var(--ink); }
+
+/* Things to try first, each with the real thing. */
+.tries { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; margin-top: 34px; }
+.try { display: grid; gap: 16px; align-content: start; padding: 18px 18px 26px; border-radius: 26px; background: var(--tile); }
+.try .shot { aspect-ratio: 16 / 10; border-radius: 16px; overflow: hidden; background: var(--shot); }
+.try .shot img { width: 100%; height: 100%; object-fit: cover; }
+.try .shot .light { display: var(--light-take); }
+.try .shot .dark { display: var(--dark-take); }
+.try .shot.widget { display: grid; place-items: center; padding: 8% 10%; background: var(--shot) var(--try-wall) center / cover; }
+.try .shot.widget img { width: 100%; height: auto; object-fit: contain; border-radius: 18px; }
+.try .text { display: grid; gap: 6px; padding-inline: 8px; }
+.try .num { color: var(--faint); font: 600 14px ui-monospace, "SF Mono", Menlo, monospace; }
+.try h3 { font-size: 22px; font-weight: 600; }
+.try p { color: var(--muted); font-size: 16px; }
+
+/* The trial. */
+.trial { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 28px; align-items: center; padding: 40px; border-radius: 28px; background: var(--raised); }
+.trial .text { display: grid; gap: 12px; }
+.trial h2 { font-size: clamp(28px, 3.4vw, 40px); font-weight: 700; }
+.trial p { color: var(--muted); max-width: 62ch; }
+
+.notice { margin-top: 14px; color: var(--muted); font-size: 16px; }
+footer { border-top: 1px solid var(--line); background: var(--paper-2); padding-block: 28px 40px; color: var(--faint); font-size: 14px; }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; }
+footer span { margin-right: auto; }
+footer a { color: var(--muted); }
+
+@media (max-width: 900px) {
+  .start, .trial { grid-template-columns: minmax(0, 1fr); }
+  .steps { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 680px) {
+  .tries { grid-template-columns: minmax(0, 1fr); }
+  section { padding-block: 56px; }
+  .trial { padding: 28px; }
+}
+</style>
+</head>
+<body>
+<header class="bar">
+  <nav class="topbar" aria-label="Notchlight">
+    <a class="brand" href="../"><span class="app-icon" aria-hidden="true"></span>Notchlight</a>
+    <a class="buy" href="https://buy.polar.sh/polar_cl_3kwCipamOJFV6MggVZJUPtsrjRJcMMvz8Tsok1mVmVn">Buy</a>
+  </nav>
+</header>
+
+<main>
+  <section>
+    <div class="wrap start">
+      <div class="head">
+        <span class="eyebrow">Free for 7 days</span>
+        <h1>Downloading Notchlight.</h1>
+        <p class="lede">The file is on its way. Here's what happens the first time you open it.</p>
+        <p class="notice" id="not-mac" hidden>Notchlight is a Mac app. Open this page on your Mac to download it.</p>
+      </div>
+      <div class="ready">
+        <h2>Your download is starting</h2>
+        <p>If nothing happens in a few seconds, use the link below.</p>
+        <a class="again" id="again" href="https://github.com/victorabuchi/notchlight/releases/latest/download/Notchlight.dmg">Download again <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.6" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10 5.8v7.6M6.7 10.4 10 13.7l3.3-3.3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <p class="small">Requires macOS Sequoia or later. Signed and notarized by Apple.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <span class="eyebrow">First launch</span>
+      <h2 style="font-size: clamp(32px, 4.4vw, 48px); font-weight: 700; margin-top: 10px">Opening it the first time.</h2>
+      <p class="lede" style="margin-top: 14px">macOS checks a new app the first time you open it, and asks you to confirm once.</p>
+      <div class="steps">
+        <div class="step"><b class="n">1</b><p>Open <strong>Notchlight.dmg</strong> and drag Notchlight into your <strong>Applications</strong> folder.</p></div>
+        <div class="step"><b class="n">2</b><p>Open Notchlight from <strong>Applications</strong>. The Setup Guide shows you the permissions each widget uses.</p></div>
+        <div class="step"><b class="n">3</b><p>When macOS says it was downloaded from the internet, click <strong>Open</strong>.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <span class="eyebrow">Once it's running</span>
+      <h2 style="font-size: clamp(32px, 4.4vw, 48px); font-weight: 700; margin-top: 10px">Things to try first.</h2>
+      <div class="tries">
+        <article class="try">
+          <div class="shot"><img class="light" src="../assets/try/lock-light.webp?v=2" alt="Widgets on a Mac's lock screen at 9:41" width="1100" height="714" loading="lazy"><img class="dark" src="../assets/try/lock-dark.webp?v=2" alt="Widgets on a Mac's lock screen at 9:41" width="1100" height="714" loading="lazy"></div>
+          <div class="text"><span class="num">01</span><h3>Lock your Mac</h3><p>Press <kbd>⌃</kbd> <kbd>⌘</kbd> <kbd>Q</kbd>. Your widgets are on the lock screen, ready before you sign in.</p></div>
+        </article>
+        <article class="try">
+          <div class="shot"><img class="light" src="../assets/try/island-light.webp?v=2" alt="The Dynamic Island showing a song beside the notch, and opened with its lyric and controls" width="1100" height="905" loading="lazy"><img class="dark" src="../assets/try/island-dark.webp?v=2" alt="The Dynamic Island showing a song beside the notch, and opened with its lyric and controls" width="1100" height="905" loading="lazy"></div>
+          <div class="text"><span class="num">02</span><h3>Point at the notch</h3><p>The island opens with the song, its synced lyrics and controls. Calls, trips and notifications show up there too.</p></div>
+        </article>
+        <article class="try">
+          <div class="shot"><img class="light" src="../assets/try/studio-light.webp?v=2" alt="Layout Studio adding a Weather widget" width="1100" height="863" loading="lazy"><img class="dark" src="../assets/try/studio-dark.webp?v=2" alt="Layout Studio adding a Weather widget" width="1100" height="863" loading="lazy"></div>
+          <div class="text"><span class="num">03</span><h3>Arrange your lock screen</h3><p>Open Layout Studio from the menu bar and drag any of the 21 widgets anywhere, in any size and style.</p></div>
+        </article>
+        <article class="try">
+          <div class="shot widget"><img src="../assets/widgets/location-satellite-medium.webp?v=2" alt="The Location widget with a satellite map of Lisbon" width="688" height="328" loading="lazy"></div>
+          <div class="text"><span class="num">04</span><h3>Make it yours</h3><p>Pick the photos for the Photos widget, a satellite map for Location, and a card style that suits your wallpaper.</p></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <div class="trial">
+        <div class="text">
+          <span class="eyebrow">7-day free trial</span>
+          <h2>Try everything on your Mac.</h2>
+          <p>Every feature is included. After the trial, buy Notchlight once for $14.99 to keep it on up to 3 of your Macs. It isn't a subscription.</p>
+          <p>No account or card is needed for the trial, and downloading never charges you.</p>
+        </div>
+        <a class="buy" href="https://buy.polar.sh/polar_cl_3kwCipamOJFV6MggVZJUPtsrjRJcMMvz8Tsok1mVmVn">Buy for $14.99</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Notchlight by Victor Abuchi</span>
+    <a href="../">Home</a>
+    <a href="../#faq">Questions</a>
+    <a href="../privacy/">Privacy</a>
+    <a href="../terms/">Terms</a>
+    <a href="https://github.com/victorabuchi/notchlight">GitHub</a>
+  </div>
+</footer>
+
+<script>
+// The download starts on its own a moment after the page opens, as Download promised. On an iPhone or iPad there's
+// nothing to install, so the page says so instead.
+(() => {
+  const handheld = /iPhone|iPad|iPod|Android/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  if (handheld) {
+    document.getElementById("not-mac").hidden = false;
+    return;
+  }
+  const link = document.getElementById("again");
+  setTimeout(() => { window.location.href = link.href; }, 700);
+})();
+</script>
+</body>
+</html>
