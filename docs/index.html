@@ -252,45 +252,78 @@ p { margin: 0; }
 .base { height: 16px; margin: 0 -5%; border-radius: 0 0 16px 16px; background: linear-gradient(#e6e7ec, #a3a7b2); box-shadow: 0 22px 30px -18px rgba(20, 20, 50, 0.45); position: relative; }
 .base::after { content: ""; position: absolute; left: 50%; top: 0; width: 15%; height: 6px; transform: translateX(-50%); border-radius: 0 0 8px 8px; background: #b4b8c3; }
 .display .shade { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(30, 20, 12, 0.26), rgba(30, 20, 12, 0.14) 35%, rgba(10, 10, 20, 0.24)); }
-.lock-date { position: absolute; top: 9.8cqw; width: 100%; text-align: center; font: 600 1.75cqw var(--rounded); color: rgba(255, 255, 255, 0.9); text-shadow: 0 1px 8px rgba(0, 0, 0, 0.25); }
-.lock-time { position: absolute; top: 11.6cqw; width: 100%; text-align: center; font: 700 11cqw/1 var(--rounded); letter-spacing: -0.01em;
+.lock-date { position: absolute; top: 3.9cqw; width: 100%; text-align: center; font: 600 1.75cqw var(--rounded); color: rgba(255, 255, 255, 0.9); text-shadow: 0 1px 8px rgba(0, 0, 0, 0.25); }
+.lock-time { position: absolute; top: 4.9cqw; width: 100%; text-align: center; font: 700 10.4cqw/1 var(--rounded); letter-spacing: -0.01em;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(214, 230, 255, 0.78)); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 2px 14px rgba(40, 30, 20, 0.25)); }
-.w { position: absolute; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35); font-size: 1.2cqw; line-height: 1.35; }
-.w .label { display: flex; align-items: center; gap: 0.5cqw; font-size: 0.85cqw; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255, 255, 255, 0.82); }
-.w .label svg { width: 1cqw; height: 1cqw; }
+/* The widgets sit where they are on a real desktop preview; each one's left and top is its place on a 1512 × 982 screen. */
+.w { position: absolute; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35); font-size: 0.9cqw; line-height: 1.3; }
+.w .label { display: flex; align-items: center; gap: 0.45cqw; font-size: 0.72cqw; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255, 255, 255, 0.78); white-space: nowrap; }
+.w .label svg { width: 0.85cqw; height: 0.85cqw; flex: none; }
 .w .dim { color: rgba(255, 255, 255, 0.72); }
-.w-next { left: 5.5%; top: 12%; width: 20%; }
-.w-next .check { width: 1.6cqw; height: 1.6cqw; margin: 1.2cqw 0 0.5cqw; display: block; }
-.w-world { left: 5.5%; top: 37%; display: grid; grid-template-columns: auto auto; gap: 0 3.4cqw; }
-.w-world .label { grid-column: 1 / -1; margin-bottom: 0.6cqw; }
-.w-world b { display: block; font: 600 2.6cqw/1.1 var(--rounded); }
-.w-world small { font-size: 0.85cqw; color: rgba(255, 255, 255, 0.6); }
-.w-brief { left: 37%; top: 35.3%; width: 32%; }
-.w-brief .day { font-size: 0.85cqw; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #ffb4a3; }
-.w-brief .hello { font: 700 2.1cqw/1.2 var(--system); margin: 0.2cqw 0 0.4cqw; }
-.w-brief .rows { display: grid; grid-template-columns: 1fr 1fr; gap: 0.3cqw 1.6cqw; font-weight: 600; font-size: 1.05cqw; }
-.w-lyrics { right: 5.5%; top: 11%; width: 27%; }
-.w-lyrics .line { font: 700 1.75cqw/1.25 var(--system); margin-top: 0.6cqw; min-height: 2.2cqw; }
-.w-lyrics .next { font: 700 1.5cqw/1.25 var(--system); color: rgba(255, 255, 255, 0.5); margin-top: 0.4cqw; }
-.w-system { right: 5.5%; top: 37%; width: 23%; display: grid; gap: 0.35cqw; }
-.w-system .row { display: grid; grid-template-columns: 6cqw 1fr 5cqw; align-items: center; gap: 0.6cqw; font-weight: 600; font-size: 1cqw; }
-.w-system .row svg { width: 100%; height: 1.6cqw; }
+.w-next { left: 5.9%; top: 8.7%; width: 20cqw; display: grid; gap: 0.62cqw; }
+.w-next .event { display: grid; border-left: 0.17cqw solid #5ab0ff; padding-left: 0.6cqw; line-height: 1.25; }
+.w-next .event b { font-weight: 600; font-size: 0.86cqw; }
+.w-next .event span { font-size: 0.76cqw; color: rgba(255, 255, 255, 0.72); }
+.w-world { left: 4.8%; top: 26.6%; display: grid; grid-template-columns: 9cqw auto; }
+.w-world .label { grid-column: 1 / -1; margin-bottom: 0.5cqw; }
+.w-world .dim { font-size: 0.8cqw; font-weight: 500; }
+.w-world b { display: block; font: 600 2cqw/1.15 var(--rounded); }
+.w-world small { font-size: 0.66cqw; color: rgba(255, 255, 255, 0.6); }
+.w-brief { left: 37.6%; top: 24.8%; width: 28.5cqw; }
+.w-brief .day { font-size: 0.68cqw; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #ff7461; }
+.w-brief .hello { font: 700 1.45cqw/1.2 var(--system); margin: 0.15cqw 0 0.5cqw; }
+.w-brief .rows { display: grid; grid-template-columns: 14.15cqw 1fr; gap: 0.4cqw 0; font-weight: 600; font-size: 0.8cqw; }
+.w-brief .rows span { display: flex; align-items: center; gap: 0.55cqw; min-width: 0; white-space: nowrap; }
+.w-brief .rows svg { width: 0.95cqw; height: 0.95cqw; flex: none; }
+.w-lyrics { left: 75.9%; top: 11.4%; width: 17cqw; }
+.w-lyrics .line { font: 700 1.02cqw/1.2 var(--system); margin-top: 0.55cqw; min-height: 2.45cqw; }
+.w-lyrics .next { font: 700 1.02cqw/1.2 var(--system); color: rgba(255, 255, 255, 0.5); margin-top: 0.45cqw; min-height: 2.45cqw; }
+.w-system { left: 75.75%; top: 24.2%; width: 17.3cqw; display: grid; gap: 0.3cqw; }
+.w-system .label { margin-bottom: 0.15cqw; }
+.w-system .row { display: grid; grid-template-columns: 0.85cqw 3.6cqw minmax(0, 1fr) 4.3cqw; align-items: center; gap: 0.45cqw; font-weight: 600; font-size: 0.76cqw; }
+.w-system .row svg { width: 100%; height: 1.15cqw; }
+.w-system .row svg.icon { height: 0.85cqw; }
 .w-system .row span:last-child { white-space: nowrap; text-align: right; color: rgba(255, 255, 255, 0.75); font-variant-numeric: tabular-nums; }
-.w-note { left: 5.5%; top: 63%; font-weight: 700; font-size: 1.05cqw; line-height: 1.45; }
-.w-stock { left: 34%; top: 49.5%; width: 21%; }
-.w-stock b { display: block; font: 600 2.1cqw/1.1 var(--rounded); }
-.w-stock .down { color: #ff7a6b; font-weight: 700; font-size: 0.95cqw; }
-.w-stock svg { width: 100%; height: 2.3cqw; margin-top: 0.3cqw; }
-.w-battery { left: 60.5%; top: 49%; width: 9cqw; text-align: center; }
-.w-battery svg { width: 6.4cqw; height: 6.4cqw; }
-.w-battery small { display: block; font-size: 0.85cqw; color: rgba(255, 255, 255, 0.75); }
-.w-todo { right: 5.5%; top: 62%; font-weight: 600; font-size: 1.45cqw; line-height: 1.4; }
-.login { position: absolute; bottom: 4.2%; left: 50%; transform: translateX(-50%); display: grid; justify-items: center; gap: 0.7cqw; }
-.login .avatar { width: 4.6cqw; height: 4.6cqw; border-radius: 50%; background: #cfeec8; display: grid; place-items: center; font-size: 3cqw; line-height: 1; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); }
-.login .name { font: 600 1.3cqw var(--system); text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3); }
-.login .field { display: flex; align-items: center; gap: 0.8cqw; }
-.login .password { width: 14cqw; height: 2.3cqw; border-radius: 99px; background: rgba(255, 255, 255, 0.24); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: rgba(255, 255, 255, 0.72); font-size: 1.05cqw; display: flex; align-items: center; padding-left: 1cqw; }
-.login .help { width: 2.1cqw; height: 2.1cqw; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.7); display: grid; place-items: center; font-size: 1.1cqw; font-weight: 700; }
+.w-note { left: 5%; top: 45.4%; font-weight: 700; font-size: 0.74cqw; line-height: 1.38; }
+.w-stock { left: 29.55%; top: 44.2%; width: 19.15cqw; height: 8cqw; }
+.w-stock .ticker { font-size: 0.72cqw; font-weight: 700; }
+.w-stock b { display: block; font: 600 1.85cqw/1.15 var(--rounded); }
+.w-stock .up { position: relative; z-index: 1; color: #5ad869; font-weight: 700; font-size: 0.7cqw; }
+.w-stock svg { position: absolute; left: -0.95cqw; top: 3.95cqw; width: 19.15cqw; height: 4.4cqw; }
+.w-battery { left: 58.75%; top: 44.5%; width: 6.3cqw; text-align: center; }
+.w-battery svg { width: 6.3cqw; height: 6.3cqw; display: block; }
+.w-battery small { display: block; margin-top: 0.45cqw; font-size: 0.66cqw; font-weight: 600; color: rgba(255, 255, 255, 0.75); white-space: nowrap; }
+.w-todo { left: 80.2%; top: 44.3%; font-weight: 600; font-size: 1.04cqw; line-height: 1.33; }
+.w-activity { left: 75.4%; top: 54.5%; width: 17.5cqw; display: grid; }
+.w-activity .total { font: 700 1.9cqw/1.15 var(--rounded); margin-top: 0.35cqw; }
+.w-activity .bars { display: grid; grid-template-columns: repeat(24, minmax(0, 1fr)); gap: 0.13cqw; align-items: end; height: 4.85cqw; margin-top: 0.55cqw; }
+.w-activity .bars span { display: flex; flex-direction: column-reverse; height: 100%; }
+.w-activity .bars span:empty { height: 0.1cqw; border-radius: 9px; background: rgba(255, 255, 255, 0.12); }
+.w-activity .bars i { display: block; flex: none; }
+.w-activity .bars i:last-child { border-radius: 0.12cqw 0.12cqw 0 0; }
+.w-activity .a1 { background: #0a7aff; }
+.w-activity .a2 { background: #33c7d9; }
+.w-activity .a3 { background: #ff9500; }
+.w-activity .a0 { background: rgba(255, 255, 255, 0.35); }
+.w-activity .axis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 0.25cqw; font-size: 0.5cqw; font-weight: 500; color: rgba(255, 255, 255, 0.55); }
+.w-activity .legend { display: grid; grid-template-columns: 7.6cqw 7.15cqw auto; margin-top: 0.8cqw; line-height: 1.25; }
+.w-activity .legend small { display: flex; align-items: center; gap: 0.25cqw; font-size: 0.66cqw; font-weight: 600; color: rgba(255, 255, 255, 0.72); white-space: nowrap; }
+.w-activity .legend small::before { content: ""; width: 0.42cqw; height: 0.42cqw; border-radius: 50%; background: var(--dot); }
+.w-activity .legend b { display: block; font-size: 0.74cqw; font-weight: 600; }
+.w-activity hr { width: 100%; height: 1px; margin: 0.75cqw 0 0.65cqw; border: 0; background: rgba(255, 255, 255, 0.16); }
+.w-activity .apps { display: grid; grid-template-columns: 9cqw auto; gap: 0.55cqw 0; }
+.w-activity .apps div { display: grid; grid-template-columns: 1.7cqw auto; align-items: center; gap: 0.5cqw; line-height: 1.2; }
+.w-activity .apps img { width: 1.7cqw; height: 1.7cqw; }
+.w-activity .apps b { display: block; font-size: 0.74cqw; font-weight: 600; }
+.w-activity .apps small { display: block; font-size: 0.66cqw; font-weight: 500; color: rgba(255, 255, 255, 0.65); }
+.w-app { top: 87%; width: 8cqw; display: grid; justify-items: center; gap: 0.55cqw; font-size: 0.72cqw; font-weight: 600; }
+.w-app img { width: 3.75cqw; height: 3.75cqw; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3)); }
+.login { position: absolute; bottom: 3.6%; left: 50%; transform: translateX(-50%); display: grid; justify-items: center; gap: 0.55cqw; }
+.login .avatar { width: 4cqw; height: 4cqw; border-radius: 50%; background: #cfeec8; display: grid; place-items: center; font-size: 2.6cqw; line-height: 1; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); }
+.login .name { font: 600 1.15cqw var(--system); text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3); }
+.login .field { display: flex; align-items: center; gap: 0.7cqw; }
+.login .password { width: 12.5cqw; height: 2.1cqw; border-radius: 99px; background: rgba(255, 255, 255, 0.24); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: rgba(255, 255, 255, 0.72); font-size: 0.95cqw; display: flex; align-items: center; padding-left: 0.9cqw; }
+.login .help { width: 1.9cqw; height: 1.9cqw; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.7); display: grid; place-items: center; font-size: 1cqw; font-weight: 700; }
 
 /* Pieces of the island. */
 .cover { background: #333 url("assets/cover.jpg?v=2") center / cover; border-radius: 22%; flex: none; }
@@ -710,7 +743,7 @@ footer .legal { flex-basis: 100%; font-size: 13px; }
         <span>Updates itself</span>
       </div>
 
-      <figure class="mac" aria-label="Notchlight on a MacBook lock screen: the island at the notch shows a song with the hotspot in a circle beside it, above the time, widgets, the Music Card and the login">
+      <figure class="mac" aria-label="Notchlight on a MacBook lock screen: the island at the notch shows a song with the hotspot in a circle beside it, above the time. Around it are Up Next, a world clock, the Daily Brief, live lyrics, System, notes, a stock, the battery, the song's artwork, the Music Card, Recent Activity, favourite apps and the login">
         <div class="lid">
           <div class="display">
             <span class="silk" aria-hidden="true"></span>
@@ -735,8 +768,9 @@ footer .legal { flex-basis: 100%; font-size: 13px; }
             <div class="lock-time">9:41</div>
             <div class="w w-next">
               <div class="label"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="3" width="12" height="11" rx="2"/><path d="M2 6.5h12M5 1.5v3M11 1.5v3"/></svg>Up next</div>
-              <svg class="check" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.3 3 3 6-6.3"/></svg>
-              <span class="dim">Nothing else today or tomorrow.</span>
+              <div class="event"><b>Design review</b><span>10:30 – 11:30</span></div>
+              <div class="event"><b>Lunch with Sam</b><span>12:30 – 13:30</span></div>
+              <div class="event"><b>Running club</b><span>18:00 – 19:00</span></div>
             </div>
             <div class="w w-world">
               <div class="label"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c2 2 2 11 0 13M8 1.5c-2 2-2 11 0 13"/></svg>World clock</div>
@@ -747,8 +781,10 @@ footer .legal { flex-basis: 100%; font-size: 13px; }
               <div class="day">Friday 16 October</div>
               <div class="hello">Good morning, Alex</div>
               <div class="rows">
-                <span>21° and sunny, high of 24°</span><span>No reminders left</span>
-                <span>Design review at 10:30</span><span>Night trains are back</span>
+                <span><svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="3.2"/><path d="M8 .9v2.2M8 12.9v2.2M.9 8h2.2M12.9 8h2.2M3 3l1.5 1.5M11.5 11.5 13 13M3 13l1.5-1.5M11.5 4.5 13 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>21° and sunny, high of 24°</span>
+                <span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="3.2" cy="4" r="1.4"/><circle cx="3.2" cy="9.5" r="1.4"/><path d="M6.8 4h7.4M6.8 9.5h7.4M2 13.8h12.2" stroke-linecap="round"/></svg>No reminders left</span>
+                <span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="1.8" y="2.6" width="12.4" height="11.4" rx="2"/><path d="M1.8 6h12.4"/><path d="M4.6 8.6h1.2M7.4 8.6h1.2M10.2 8.6h1.2M4.6 11.2h1.2M7.4 11.2h1.2" stroke-linecap="round"/></svg>Design review at 10:30</span>
+                <span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="1.8" y="2.2" width="12.4" height="11.6" rx="1.6"/><path d="M4.4 5.2h3.4v3.2H4.4zM9.6 5.4h2.2M9.6 8.2h2.2M4.4 11h7.4" stroke-linecap="round"/></svg>Night trains are back</span>
               </div>
             </div>
             <div class="w w-lyrics">
@@ -758,38 +794,54 @@ footer .legal { flex-basis: 100%; font-size: 13px; }
             </div>
             <div class="w w-system">
               <div class="label"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="3" width="10" height="10" rx="2"/><path d="M6 1v2M10 1v2M6 13v2M10 13v2M1 6h2M1 10h2M13 6h2M13 10h2"/></svg>System</div>
-              <div class="row"><span>CPU</span><svg viewBox="0 0 100 20" preserveAspectRatio="none"><polyline fill="none" stroke="#d07cff" stroke-width="1.6" points="0,14 8,8 16,12 24,6 32,11 40,9 48,13 56,7 64,12 72,10 80,14 88,9 100,11"/></svg><span>16%</span></div>
-              <div class="row"><span>Memory</span><svg viewBox="0 0 100 20" preserveAspectRatio="none"><polyline fill="none" stroke="#7ee08a" stroke-width="1.6" points="0,9 20,9 40,8 60,9 80,8 100,8"/></svg><span>64%</span></div>
-              <div class="row"><span>Network</span><svg viewBox="0 0 100 20" preserveAspectRatio="none"><polyline fill="none" stroke="#7cc6ff" stroke-width="1.6" points="0,17 20,17 40,16 55,17 62,6 68,16 80,17 100,16"/></svg><span>↓ 2 MB/s</span></div>
+              <div class="row"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="#d07cff" stroke-width="1.5"><rect x="3" y="3" width="10" height="10" rx="2"/><rect x="6" y="6" width="4" height="4" rx=".6"/></svg><span>CPU</span><svg viewBox="0 0 100 20" preserveAspectRatio="none"><polyline fill="none" stroke="#d07cff" stroke-width="1.6" points="0,9 8,6 16,8 24,5 32,7 40,6 48,8 56,5 64,7 72,6 80,8 88,6 100,7"/></svg><span>16%</span></div>
+              <div class="row"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="#7ee08a" stroke-width="1.5"><rect x="1.5" y="4.5" width="13" height="7" rx="1.8"/></svg><span>Memory</span><svg viewBox="0 0 100 20" preserveAspectRatio="none"><polyline fill="none" stroke="#7ee08a" stroke-width="1.6" points="0,11 20,11 40,10 60,11 80,10 100,10"/></svg><span>64%</span></div>
+              <div class="row"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="#7cc6ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13V3M2.5 5.5 5 3l2.5 2.5M11 3v10M8.5 10.5 11 13l2.5-2.5"/></svg><span>Network</span><svg viewBox="0 0 100 20" preserveAspectRatio="none"><polyline fill="none" stroke="#7cc6ff" stroke-width="1.6" points="0,18 8,18 11,4 14,18 24,18 27,6 30,18 40,18 43,3 46,18 56,18 59,7 62,18 72,18 75,4 78,18 88,18 91,8 94,18 100,18"/></svg><span>↓ 2 MB/s</span></div>
             </div>
-            <div class="w w-note">Before Friday<br><span class="dim">— Pick up the camera<br>— Book the train<br>— Call Mum</span></div>
+            <div class="w w-note">BEFORE FRIDAY<br>-Pick up the camera<br>-Book the train<br>-Call Mum</div>
             <div class="w w-stock">
-              <div class="label">S&amp;P 500</div>
-              <b>6,412.30</b>
-              <span class="down">▼ 0.28%</span>
+              <div class="ticker">AAPL</div>
+              <b>243.46</b>
+              <span class="up">▲ 0.43%</span>
               <svg viewBox="0 0 120 40" preserveAspectRatio="none" aria-hidden="true">
-                <defs><linearGradient id="stock-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff7a6b" stop-opacity=".35"/><stop offset="1" stop-color="#ff7a6b" stop-opacity="0"/></linearGradient></defs>
-                <path d="M0,6 L10,9 18,8 26,15 34,17 42,13 50,11 58,7 64,12 72,9 80,16 88,24 96,21 104,19 112,25 120,26 L120,40 L0,40 Z" fill="url(#stock-fill)"/>
-                <polyline fill="none" stroke="#ff7a6b" stroke-width="1.4" points="0,6 10,9 18,8 26,15 34,17 42,13 50,11 58,7 64,12 72,9 80,16 88,24 96,21 104,19 112,25 120,26"/>
-                <line x1="0" y1="20" x2="120" y2="20" stroke="rgba(255,255,255,.4)" stroke-dasharray="2 2" stroke-width=".6"/>
+                <defs><linearGradient id="stock-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5ad869" stop-opacity=".32"/><stop offset="1" stop-color="#5ad869" stop-opacity="0"/></linearGradient></defs>
+                <path d="M0,17 L4,7 9,7 13,10 17,6 21,3 25,4 29,0 35,3 39,8 42,6 46,3 50,6 53,7 57,9 60,8 64,22 68,18 73,22 78,24 82,26 87,30 93,40 97,34 102,28 106,22 111,16 115,18 120,18 L120,40 L0,40 Z" fill="url(#stock-fill)"/>
+                <polyline fill="none" stroke="#5ad869" stroke-width="1.3" stroke-linejoin="round" points="0,17 4,7 9,7 13,10 17,6 21,3 25,4 29,0 35,3 39,8 42,6 46,3 50,6 53,7 57,9 60,8 64,22 68,18 73,22 78,24 82,26 87,30 93,40 97,34 102,28 106,22 111,16 115,18 120,18"/>
+                <line x1="0" y1="29.6" x2="120" y2="29.6" stroke="rgba(255,255,255,.4)" stroke-dasharray="2 2" stroke-width=".6"/>
               </svg>
             </div>
             <div class="w w-battery">
               <svg viewBox="0 0 40 40" aria-hidden="true">
-                <circle cx="20" cy="20" r="16" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="3"/>
-                <circle cx="20" cy="20" r="16" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-dasharray="46.3 100.5" transform="rotate(-90 20 20)"/>
-                <text x="20" y="23.5" text-anchor="middle" fill="#fff" font-size="9" font-weight="700" font-family="-apple-system, system-ui">46%</text>
+                <circle cx="20" cy="20" r="17" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="2.6"/>
+                <circle cx="20" cy="20" r="17" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="49.1 106.8" transform="rotate(-90 20 20)"/>
+                <rect x="16.6" y="11.4" width="6" height="3.2" rx=".9" fill="none" stroke="rgba(255,255,255,.75)" stroke-width=".7"/><rect x="17.3" y="12.1" width="2.6" height="1.8" rx=".4" fill="rgba(255,255,255,.75)"/><path d="M23.2 12.4v1.2" stroke="rgba(255,255,255,.75)" stroke-width=".7" stroke-linecap="round"/>
+                <text x="20" y="24.8" text-anchor="middle" fill="#fff" font-size="8.6" font-weight="600" font-family="ui-rounded, -apple-system, system-ui">46%</text>
               </svg>
-              <small>4 h 49 min left</small>
+              <small>4h 49m left</small>
             </div>
-            <div class="w w-todo">Finish the slides<br>— Robotics project<br>— Reading list</div>
-            <img class="sw glass r26" src="assets/widgets/musicCard-glass-wide.webp?v=2" alt="" width="524" height="164" style="--cx:756;--cy:701;--w:524;--h:164">
+            <div class="w w-todo">Finish the slides<br>-Robotics project<br>-Reading list</div>
+            <img class="sw" src="assets/widgets/nowPlaying-artwork-large.webp?v=2" alt="" width="688" height="688" style="--cx:203;--cy:683;--w:290;--h:290">
+            <img class="sw glass r26" src="assets/widgets/musicCard-glass-wide.webp?v=2" alt="" width="524" height="164" style="--cx:771;--cy:708;--w:438;--h:137">
+            <div class="w w-activity">
+              <div class="label"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M3.5 1.5h9M3.5 14.5h9M4.5 1.5c0 4 7 4.5 7 6.5s-7 2.5-7 6.5M11.5 1.5c0 4-7 4.5-7 6.5s7 2.5 7 6.5"/></svg>Today</div>
+              <div class="total">3 h 11 min</div>
+              <div class="bars" aria-hidden="true"><span><i class="a1" style="height:33.3%"></i><i class="a3" style="height:8.3%"></i><i class="a0" style="height:15.0%"></i></span><span><i class="a1" style="height:15.0%"></i><i class="a2" style="height:20.0%"></i><i class="a0" style="height:8.3%"></i></span><span></span><span></span><span></span><span></span><span></span><span><i class="a1" style="height:16.7%"></i><i class="a3" style="height:16.7%"></i><i class="a0" style="height:16.7%"></i></span><span><i class="a1" style="height:36.7%"></i><i class="a2" style="height:33.3%"></i><i class="a3" style="height:16.7%"></i><i class="a0" style="height:13.3%"></i></span><span><i class="a1" style="height:30.0%"></i><i class="a2" style="height:30.0%"></i><i class="a3" style="height:8.3%"></i></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+              <div class="axis" aria-hidden="true"><span>0</span><span>6</span><span>12</span><span>18</span></div>
+              <div class="legend">
+                <span><small style="--dot:#0a7aff">Safari</small><b>1 h 19 min</b></span>
+                <span><small style="--dot:#33c7d9">Xcode</small><b>50 min</b></span>
+                <span><small style="--dot:#ff9500">Mail</small><b>30 min</b></span>
+              </div>
+              <hr>
+              <div class="apps"><div><img src="assets/apps/safari-64.webp?v=2" alt=""><span><b>Safari</b><small>1 h 19 min</small></span></div><div><img src="assets/apps/xcode-64.webp?v=2" alt=""><span><b>Xcode</b><small>50 min</small></span></div><div><img src="assets/apps/mail-64.webp?v=2" alt=""><span><b>Mail</b><small>30 min</small></span></div><div><img src="assets/apps/messages-64.webp?v=2" alt=""><span><b>Messages</b><small>16 min</small></span></div><div><img src="assets/apps/notchlight-64.webp?v=2" alt=""><span><b>Notchlight</b><small>8 min</small></span></div><div><img src="assets/apps/music-64.webp?v=2" alt=""><span><b>Music</b><small>8 min</small></span></div></div>
+            </div>
+            <div class="w w-app" style="left: 1.9%"><img src="assets/apps/settings.webp?v=2" alt="">System Settings</div>
+            <div class="w w-app" style="left: 90.1%"><img src="assets/apps/music-dark.webp?v=2" alt="">Music</div>
             <div class="login">
               <div class="avatar" role="img" aria-label="Panda avatar">🐼</div>
               <div class="name">Alex</div>
               <div class="field"><div class="password">Enter Password</div><div class="help">?</div></div>
             </div>
-          </div>
         </div>
         <div class="base"></div>
       </figure>
