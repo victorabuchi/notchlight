@@ -102,7 +102,7 @@ final class LyricsStore: ObservableObject {
             if delay > 0 { try? await Task.sleep(for: .seconds(delay)) }
             guard !Task.isCancelled else { return }
             let found = await LRCLib.lyrics(for: track)
-            await MainActor.run {
+            await MainActor.run { [weak self] in
                 guard let self, !Task.isCancelled, NowPlayingStore.shared.track?.id == key, !self.fromApple else { return }
                 if let found {
                     self.show(found, key: key, keep: false)

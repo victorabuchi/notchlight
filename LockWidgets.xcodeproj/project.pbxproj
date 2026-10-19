@@ -34,6 +34,7 @@
 		498525240AF04CC22C138ECB /* StickyNoteWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5542B4EFD93B4AB2028DCB89 /* StickyNoteWidget.swift */; };
 		518E03FAE3F3E7B82E76716F /* BatteryMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E623E3C959D0409FB161F2BA /* BatteryMonitor.swift */; };
 		52690D0AE034DEDF3E3D8D2E /* LayoutStudioPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 340B9D05531D1298D3305788 /* LayoutStudioPage.swift */; };
+		53F7DFD949E0F0C4DFEFAE1D /* ShortcutsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB785130E7E8434D7FE19C30 /* ShortcutsStore.swift */; };
 		55BCB7E3172B68212EBE9797 /* WidgetGallery.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECCAE2E92BCBB1A729F1F6F3 /* WidgetGallery.swift */; };
 		576D5B2ABF3B13EF4189F685 /* StocksStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A513FE231239454ED6ED159 /* StocksStore.swift */; };
 		5A148EDD12571E5D5038FD64 /* SettingsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8314A5D52CFB7C8C3DC10023 /* SettingsKeys.swift */; };
@@ -79,6 +80,7 @@
 		E3A39614A198C8D439541BDD /* IslandModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23D896622CD53F80E294F62C /* IslandModel.swift */; };
 		E6A7094B55903D1451A0D767 /* PhotosWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E247A3444F4E8B1630533277 /* PhotosWidget.swift */; };
 		E9B7A91CE8C1510260200D5B /* WidgetKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241AC26A12C04E385F4ABA7E /* WidgetKind.swift */; };
+		EAC4E9FD9EBEEB4FBC2DAACB /* QuickNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD56AD74FAEF1F747270A9C8 /* QuickNote.swift */; };
 		F251FDA54218560388619A49 /* AppearancePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87979B3677A77236CBF7E633 /* AppearancePage.swift */; };
 		F417D8902F974CAC202619E4 /* StocksWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A99106C5F26776FAC5A68FE4 /* StocksWidget.swift */; };
 		F8E78ABA08C2E9397CD0F450 /* LockWidgetsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1E94A502A0529914509ECE /* LockWidgetsApp.swift */; };
@@ -143,6 +145,7 @@
 		A78DAF013E95E14A143A0322 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		A84B8C12897A8C598ADF01B7 /* WhatsNewPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhatsNewPage.swift; sourceTree = "<group>"; };
 		A99106C5F26776FAC5A68FE4 /* StocksWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StocksWidget.swift; sourceTree = "<group>"; };
+		AB785130E7E8434D7FE19C30 /* ShortcutsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutsStore.swift; sourceTree = "<group>"; };
 		B89DD3FFD2031BE341D7A0DC /* ActivityWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityWidget.swift; sourceTree = "<group>"; };
 		BB6AF92AA3C096A2C102584A /* CalendarStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarStore.swift; sourceTree = "<group>"; };
 		C072D9FA5183B596ABFBA02B /* MusicIsland.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicIsland.swift; sourceTree = "<group>"; };
@@ -156,6 +159,7 @@
 		CA558E33214FD867D2DF7B02 /* LocationWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationWidget.swift; sourceTree = "<group>"; };
 		CA65EB68D63BB068EC166544 /* DeviceMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceMonitor.swift; sourceTree = "<group>"; };
 		CB910C73FBFB4C186BF67F02 /* TripStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripStore.swift; sourceTree = "<group>"; };
+		CD56AD74FAEF1F747270A9C8 /* QuickNote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickNote.swift; sourceTree = "<group>"; };
 		CF728633E3B7B9FEAFF17FB5 /* LyricsWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsWidget.swift; sourceTree = "<group>"; };
 		DCB192CC30D0F25EF056A5D4 /* SystemWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemWidget.swift; sourceTree = "<group>"; };
 		DD41E562DF501668F3C9B5B9 /* StatusIsland.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusIsland.swift; sourceTree = "<group>"; };
@@ -271,7 +275,9 @@
 				5D7B8609BD101B905C97D79E /* NowPlayingStore.swift */,
 				A0898E2431D9B5E4809FB335 /* PhotosStore.swift */,
 				00FB388C82226A174F836470 /* PreferencesMigration.swift */,
+				CD56AD74FAEF1F747270A9C8 /* QuickNote.swift */,
 				C6C4166E066E91470CCA71C3 /* RemindersStore.swift */,
+				AB785130E7E8434D7FE19C30 /* ShortcutsStore.swift */,
 				C0D20AD676D5BD191B77CCEB /* StatusMonitor.swift */,
 				8A513FE231239454ED6ED159 /* StocksStore.swift */,
 				3F494EDCBD251C16B86A4343 /* SystemMonitor.swift */,
@@ -467,11 +473,13 @@
 				B68A0FFCD5CEFAEFE740A663 /* PhotosStore.swift in Sources */,
 				E6A7094B55903D1451A0D767 /* PhotosWidget.swift in Sources */,
 				E269AFCAC0D00F660729B5BA /* PreferencesMigration.swift in Sources */,
+				EAC4E9FD9EBEEB4FBC2DAACB /* QuickNote.swift in Sources */,
 				09238D4482D2B0E1052B2F8F /* RemindersStore.swift in Sources */,
 				0A08C21283ABA0CC9BBB2311 /* RemindersWidget.swift in Sources */,
 				5A148EDD12571E5D5038FD64 /* SettingsKeys.swift in Sources */,
 				96FD7E333C27BD707372BA2A /* SettingsWindow.swift in Sources */,
 				28444C241B56E75429328FED /* SetupGuide.swift in Sources */,
+				53F7DFD949E0F0C4DFEFAE1D /* ShortcutsStore.swift in Sources */,
 				72622F7F7AD016E9591D15C9 /* StatusIsland.swift in Sources */,
 				CD51DB4356E8C25BAA8591CB /* StatusMonitor.swift in Sources */,
 				498525240AF04CC22C138ECB /* StickyNoteWidget.swift in Sources */,

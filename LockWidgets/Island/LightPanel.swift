@@ -57,6 +57,8 @@ final class LightController {
         if panel == nil { makePanel() }
         model.notch = island.notch
         model.widgets = LightWidget.chosen
+        if model.widgets.contains(.notes) { QuickNote.shared.pull() }
+        if model.widgets.contains(.shortcuts) { ShortcutsStore.shared.reload() }
         model.trayCount = TrayStore.shared.files.count
         // It grows out of whatever the island is showing, and folds back into it.
         model.startSize = island.size == .zero ? island.notch : island.size
@@ -172,7 +174,7 @@ final class LightModel: ObservableObject {
     @Published var trayCount = 0
     var notch = CGSize(width: 185, height: 32)
     var startSize = CGSize(width: 185, height: 32)
-    var widgets = LightWidget.allCases
+    var widgets = LightWidget.standard
 
     /// Light is wide enough for its widgets side by side; the Tray grows with its files; the drop area holds
     /// its two places. None is wider than the screen allows.
@@ -276,7 +278,7 @@ struct LightView: View {
 
 /// The widgets Light can show, side by side in this order.
 enum LightWidget: String, CaseIterable, Identifiable {
-    case music, mirror, calendar, notes, timers, todos
+    case music, mirror, calendar, notes, timers, todos, weather, battery, shortcuts
 
     var id: String { rawValue }
 
@@ -288,6 +290,9 @@ enum LightWidget: String, CaseIterable, Identifiable {
         case .notes: "Notes"
         case .timers: "Timers"
         case .todos: "To-dos"
+        case .weather: "Weather"
+        case .battery: "Battery"
+        case .shortcuts: "Shortcuts"
         }
     }
 
@@ -299,18 +304,31 @@ enum LightWidget: String, CaseIterable, Identifiable {
         case .notes: 196
         case .timers: 206
         case .todos: 196
+        case .weather: 150
+        case .battery: 116
+        case .shortcuts: 210
         }
     }
 
     /// Room for the line between two widgets.
     static let gap: CGFloat = 29
 
-    /// The widgets chosen in Notch Settings; all of them until the user picks, or the song alone.
+    /// What Light shows until the user chooses.
+    static let standard: [LightWidget] = [.music, .mirror, .calendar, .notes, .timers, .todos]
+    static var standardList: String { standard.map(\.rawValue).joined(separator: ",") }
+
+    /// The widgets chosen in Notch Settings, in the user's order, or the song alone.
     static var chosen: [LightWidget] {
         if UserDefaults.standard.string(forKey: SettingsKey.lightShows) == "music" { return [.music] }
-        guard let saved = UserDefaults.standard.string(forKey: SettingsKey.lightWidgets) else { return allCases }
-        let names = Set(saved.split(separator: ",").map(String.init))
-        return allCases.filter { names.contains($0.rawValue) }
+        guard let saved = UserDefaults.standard.string(forKey: SettingsKey.lightWidgets) else { return standard }
+        return saved.split(separator: ",").compactMap { LightWidget(rawValue: String($0)) }
+    }
+
+    /// Opens an app by its bundle identifier, and folds Light away.
+    static func open(_ bundleID: String) {
+        LightController.shared.close()
+        guard let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID) else { return }
+        NSWorkspace.shared.openApplication(at: url, configuration: .init())
     }
 }
 
@@ -337,6 +355,9 @@ private struct LightStrip: View {
                         case .notes: LightNotes()
                         case .timers: LightTimers()
                         case .todos: LightTodos()
+                        case .weather: LightWeather()
+                        case .battery: LightBattery()
+                        case .shortcuts: LightShortcuts()
                         }
                     }
                     .frame(width: widget.width)
@@ -365,9 +386,12 @@ private struct LightMusic: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 12) {
                 Artwork(image: music.artwork, size: 64, cornerRadius: 10)
+                    .onTapGesture { LightWidget.open(track.player.rawValue) }
+                    .help("Open \(track.player.name)")
                 VStack(alignment: .leading, spacing: 1) {
                     Text(track.title)
                         .font(.system(size: 14, weight: .bold))
+                        .onTapGesture { LightWidget.open(track.player.rawValue) }
                     if !track.album.isEmpty, track.album != track.title {
                         Text(track.album)
                             .font(.system(size: 12, weight: .semibold))
@@ -517,6 +541,17 @@ private struct MirrorCircle: View {
             .contentShape(Circle())
         }
         .buttonStyle(IslandButtonStyle())
+        .overlay(alignment: .bottomTrailing) {
+            Button { LightWidget.open("com.apple.FaceTime") } label: {
+                Image(systemName: "video.fill")
+                    .font(.system(size: 10, weight: .bold))
+                    .frame(width: 26, height: 26)
+                    .background(Circle().fill(Color(red: 0.2, green: 0.78, blue: 0.35)))
+                    .contentShape(Circle())
+            }
+            .buttonStyle(IslandButtonStyle())
+            .help("Open FaceTime")
+        }
     }
 }
 
@@ -631,6 +666,9 @@ private struct LightCalendar: View {
                 Text(selected.formatted(.dateTime.month(.abbreviated)))
                     .font(.system(size: 19, weight: .bold))
                     .frame(width: 44, alignment: .leading)
+                    .contentShape(Rectangle())
+                    .onTapGesture { openCalendar() }
+                    .help("Open Calendar")
                 ForEach(days, id: \.self) { day in
                     let isSelected = Calendar.current.isDate(day, inSameDayAs: selected)
                     let isToday = Calendar.current.isDateInToday(day)
@@ -683,6 +721,8 @@ private struct LightCalendar: View {
                                 }
                                 .lineLimit(1)
                             }
+                            .contentShape(Rectangle())
+                            .onTapGesture { openCalendar() }
                         }
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
@@ -692,19 +732,35 @@ private struct LightCalendar: View {
     }
 }
 
-/// A note that stays between visits.
+extension LightCalendar {
+    /// Calendar, showing the chosen day.
+    fileprivate func openCalendar() {
+        LightController.shared.close()
+        let days = Calendar.current.dateComponents([.day], from: Calendar.current.startOfDay(for: .now), to: selected).day ?? 0
+        DispatchQueue.global(qos: .userInitiated).async {
+            let script = "tell application id \"com.apple.iCal\"\nactivate\nswitch view to day view\nview calendar at ((current date) + \(days) * days)\nend tell"
+            var error: NSDictionary?
+            if NSAppleScript(source: script)?.executeAndReturnError(&error) == nil {
+                DispatchQueue.main.async { LightWidget.open("com.apple.iCal") }
+            }
+        }
+    }
+}
+
+/// A note that stays between visits, and in Apple Notes as "Notchlight".
 private struct LightNotes: View {
-    @AppStorage(SettingsKey.lightNotes) private var text = ""
+    @ObservedObject private var note = QuickNote.shared
 
     var body: some View {
+        let text = Binding(get: { note.text }, set: { note.edit($0) })
         ZStack(alignment: .topLeading) {
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .fill(Color.white.opacity(0.08))
-            NotchTextEditor(text: $text, sample: "Notes for me.\nPick up the camera at 5.")
+            NotchTextEditor(text: text, sample: "Notes for me.\nPick up the camera at 5.")
                 .font(.system(size: 12))
                 .padding(.horizontal, 8)
                 .padding(.vertical, 9)
-            if text.isEmpty, !NotchGallery.isDrawing {
+            if note.text.isEmpty, !NotchGallery.isDrawing {
                 Text("Notes for me…")
                     .font(.system(size: 12))
                     .foregroundStyle(.white.opacity(0.35))
@@ -712,6 +768,18 @@ private struct LightNotes: View {
                     .padding(.vertical, 9)
                     .allowsHitTesting(false)
             }
+        }
+        .overlay(alignment: .bottomTrailing) {
+            Button { LightController.shared.close(); note.openInNotes() } label: {
+                Image(systemName: "note.text")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.6))
+                    .frame(width: 24, height: 24)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(IslandButtonStyle())
+            .help("Open in Notes")
+            .padding(4)
         }
         .frame(maxHeight: .infinity)
     }
@@ -736,10 +804,21 @@ private struct LightTimers: View {
                     }
                 }
             } else {
-                Button { choosing = true } label: {
-                    Label("Add Timer", systemImage: "plus")
+                HStack {
+                    Button { choosing = true } label: {
+                        Label("Add Timer", systemImage: "plus")
+                    }
+                    .buttonStyle(NotchPillStyle())
+                    Spacer()
+                    Button { LightWidget.open("com.apple.clock") } label: {
+                        Image(systemName: "clock")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.6))
+                            .frame(width: 24, height: 24)
+                    }
+                    .buttonStyle(IslandButtonStyle())
+                    .help("Open Clock")
                 }
-                .buttonStyle(NotchPillStyle())
             }
             if store.timers.isEmpty {
                 Text("Pick a length to start a timer. It chimes at zero.")
@@ -807,22 +886,26 @@ private struct LightTodos: View {
                 .frame(height: 28)
                 .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.white.opacity(0.08)))
                 ForEach(store.items.prefix(3)) { item in
-                    Button { withAnimation { store.complete(item.id) } } label: {
-                        HStack(spacing: 7) {
+                    HStack(spacing: 7) {
+                        Button { withAnimation { store.complete(item.id) } } label: {
                             Image(systemName: "circle")
                                 .font(.system(size: 13))
                                 .foregroundStyle(Color(nsColor: item.color))
-                            Text(item.title)
-                                .font(.system(size: 12, weight: .medium))
-                                .lineLimit(1)
-                            Spacer(minLength: 0)
+                                .contentShape(Rectangle())
                         }
-                        .contentShape(Rectangle())
+                        .buttonStyle(IslandButtonStyle())
+                        .help("Mark as done")
+                        Text(item.title)
+                            .font(.system(size: 12, weight: .medium))
+                            .lineLimit(1)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .contentShape(Rectangle())
+                            .onTapGesture { LightWidget.open("com.apple.reminders") }
                     }
-                    .buttonStyle(IslandButtonStyle())
                 }
                 if store.items.isEmpty {
-                    Text("All done.")
+                    Button("All done. Open Reminders") { LightWidget.open("com.apple.reminders") }
+                        .buttonStyle(IslandButtonStyle())
                         .font(.system(size: 11))
                         .foregroundStyle(.white.opacity(0.5))
                 }
@@ -834,6 +917,123 @@ private struct LightTodos: View {
                     store.status == .notDetermined ? store.requestAccess() : store.openPrivacySettings()
                 }
                 .buttonStyle(NotchPillStyle())
+            }
+        }
+        .frame(maxHeight: .infinity, alignment: .top)
+        .padding(.top, 4)
+    }
+}
+
+/// The weather where you are, as the lock screen's Weather widget has it.
+private struct LightWeather: View {
+    @ObservedObject private var weather = WeatherStore.shared
+
+    var body: some View {
+        if let report = weather.report {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(report.place)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.6))
+                    .lineLimit(1)
+                HStack(spacing: 8) {
+                    Image(systemName: WeatherCode.symbol(report.code, isDay: report.isDay))
+                        .symbolRenderingMode(.multicolor)
+                        .font(.system(size: 26))
+                    Text("\(Int(report.temperature.rounded()))°")
+                        .font(.system(size: 30, weight: .semibold, design: .rounded))
+                }
+                Text(WeatherCode.description(report.code))
+                    .font(.system(size: 12, weight: .semibold))
+                    .lineLimit(1)
+                Text("H:\(Int(report.high.rounded()))°  L:\(Int(report.low.rounded()))°")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.6))
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+            .onTapGesture { LightWidget.open("com.apple.weather") }
+            .help("Open Weather")
+        } else {
+            Text(weather.problem ?? "Getting the weather…")
+                .font(.system(size: 11))
+                .foregroundStyle(.white.opacity(0.5))
+        }
+    }
+}
+
+/// The battery's charge in a ring, and the time left.
+private struct LightBattery: View {
+    @ObservedObject private var battery = BatteryMonitor.shared
+
+    var body: some View {
+        if let level = battery.level {
+            let color: Color = battery.isCharging || battery.isPluggedIn ? .green : level <= 10 ? .red : level <= 20 ? .orange : .white
+            VStack(spacing: 6) {
+                ZStack {
+                    Circle().stroke(Color.white.opacity(0.14), lineWidth: 7)
+                    Circle()
+                        .trim(from: 0, to: CGFloat(level) / 100)
+                        .stroke(color, style: StrokeStyle(lineWidth: 7, lineCap: .round))
+                        .rotationEffect(.degrees(-90))
+                    VStack(spacing: 0) {
+                        Image(systemName: battery.isCharging ? "bolt.fill" : "battery.75")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.6))
+                        Text("\(level)%")
+                            .font(.system(size: 17, weight: .semibold, design: .rounded))
+                    }
+                }
+                .frame(width: 76, height: 76)
+                Text(status)
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.6))
+                    .lineLimit(1)
+            }
+            .contentShape(Rectangle())
+            .onTapGesture { LightController.shared.close(); NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.Battery-Settings.extension")!) }
+            .help("Open Battery settings")
+        } else {
+            Text("This Mac has no battery.")
+                .font(.system(size: 11))
+                .foregroundStyle(.white.opacity(0.5))
+        }
+    }
+
+    private var status: String {
+        let time = battery.minutesRemaining.map { $0 >= 60 ? "\($0 / 60)h \($0 % 60)m" : "\($0)m" }
+        if battery.isCharging { return time.map { "\($0) to full" } ?? "Charging" }
+        if battery.isPluggedIn { return "Plugged in" }
+        return time.map { "\($0) left" } ?? "On battery"
+    }
+}
+
+/// Your shortcuts from the Shortcuts app, each a click away.
+private struct LightShortcuts: View {
+    @ObservedObject private var store = ShortcutsStore.shared
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            if store.names.isEmpty {
+                Text(store.isLoaded ? "No shortcuts yet. Make one in Shortcuts and it shows up here." : "Loading your shortcuts…")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.white.opacity(0.5))
+                    .fixedSize(horizontal: false, vertical: true)
+                if store.isLoaded {
+                    Button("Open Shortcuts") { LightWidget.open("com.apple.shortcuts") }
+                        .buttonStyle(NotchPillStyle())
+                }
+            } else {
+                LazyVGrid(columns: [GridItem(.flexible(), spacing: 6), GridItem(.flexible())], spacing: 6) {
+                    ForEach(store.names.prefix(6), id: \.self) { name in
+                        Button { store.run(name) } label: {
+                            Text(name)
+                                .lineLimit(1)
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(NotchPillStyle())
+                        .help("Run \(name)")
+                    }
+                }
             }
         }
         .frame(maxHeight: .infinity, alignment: .top)

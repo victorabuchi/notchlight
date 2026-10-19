@@ -218,7 +218,7 @@ private struct NotchGeneralTab: View {
             SettingsKey.islandHoverOpens, SettingsKey.notchWidthAdjust, SettingsKey.notchHeightAdjust, SettingsKey.gestures,
             SettingsKey.gestureOpenClose, SettingsKey.gestureMedia, SettingsKey.gestureInvert, SettingsKey.liquidGlass,
             SettingsKey.liquidTint, SettingsKey.liquidClear, SettingsKey.lightEnabled, SettingsKey.lightOnHover,
-            SettingsKey.lightWidgets, SettingsKey.lightShows, SettingsKey.islandClick, SettingsKey.trayOpensWithFiles, SettingsKey.dropArea, SettingsKey.dropAirDrop,
+            SettingsKey.lightWidgets, SettingsKey.lightShows, SettingsKey.lightNotesSync, SettingsKey.islandClick, SettingsKey.trayOpensWithFiles, SettingsKey.dropArea, SettingsKey.dropAirDrop,
         ]
         keys.forEach(UserDefaults.standard.removeObject(forKey:))
     }
@@ -286,7 +286,8 @@ private struct GesturesTab: View {
 private struct LightTab: View {
     @AppStorage(SettingsKey.lightEnabled) private var light = true
     @AppStorage(SettingsKey.lightOnHover) private var onHover = false
-    @AppStorage(SettingsKey.lightWidgets) private var widgets = LightWidget.allCases.map(\.rawValue).joined(separator: ",")
+    @AppStorage(SettingsKey.lightWidgets) private var widgets = LightWidget.standardList
+    @AppStorage(SettingsKey.lightNotesSync) private var notesSync = true
     @AppStorage(SettingsKey.lightShows) private var shows = "all"
     @AppStorage(SettingsKey.islandClick) private var click = "light"
 
@@ -323,30 +324,63 @@ private struct LightTab: View {
             Check("Open when you point at the notch", "Light drops down as the pointer rests on the empty notch, without a click.", isOn: $onHover)
                 .disabled(!light)
             LabeledContent("Widgets:") {
-                VStack(alignment: .leading, spacing: 7) {
-                    ForEach(LightWidget.allCases) { widget in
-                        Toggle(widget.title, isOn: shows(widget))
+                VStack(alignment: .leading, spacing: 6) {
+                    ForEach(listed) { widget in
+                        let index = order.firstIndex(of: widget)
+                        HStack(spacing: 6) {
+                            Toggle(widget.title, isOn: shows(widget))
+                            Spacer()
+                            if let index {
+                                Button { move(widget, by: -1) } label: { Image(systemName: "chevron.up") }
+                                    .disabled(index == 0)
+                                    .help("Move left in Light")
+                                Button { move(widget, by: 1) } label: { Image(systemName: "chevron.down") }
+                                    .disabled(index == order.count - 1)
+                                    .help("Move right in Light")
+                            }
+                        }
+                        .buttonStyle(.borderless)
+                        .frame(maxWidth: 300)
                     }
-                    Text("They sit side by side in Light, in this order. The Mirror shows your camera only when you click it, and turns it off when Light closes.")
+                    Text("They sit side by side in Light, left to right in this order. Turn one off and another on to swap them. Calendar and To-dos are your own Calendar and Reminders, so they stay in sync with your iPhone.")
                         .font(.callout)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
             .disabled(!light || shows == "music")
+            Check("Keep the note in Apple Notes", "Light's note is also a note called \u{201C}Notchlight\u{201D} in Notes, so it's on your iPhone too. Notes asks once for permission, the first time you write.", isOn: $notesSync)
+                .disabled(!light)
         }
     }
 }
 
 extension LightTab {
+    /// The chosen widgets, in Light's order.
+    private var order: [LightWidget] {
+        widgets.split(separator: ",").compactMap { LightWidget(rawValue: String($0)) }
+    }
+
+    /// The chosen widgets in order, then the rest.
+    private var listed: [LightWidget] {
+        order + LightWidget.allCases.filter { !order.contains($0) }
+    }
+
     private func shows(_ widget: LightWidget) -> Binding<Bool> {
         Binding {
-            widgets.split(separator: ",").contains { $0 == widget.rawValue }
+            order.contains(widget)
         } set: { on in
-            var chosen = Set(widgets.split(separator: ",").map(String.init))
-            if on { chosen.insert(widget.rawValue) } else { chosen.remove(widget.rawValue) }
-            widgets = LightWidget.allCases.map(\.rawValue).filter(chosen.contains).joined(separator: ",")
+            var chosen = order.filter { $0 != widget }
+            if on { chosen.append(widget) }
+            widgets = chosen.map(\.rawValue).joined(separator: ",")
         }
+    }
+
+    private func move(_ widget: LightWidget, by step: Int) {
+        var chosen = order
+        guard let index = chosen.firstIndex(of: widget), chosen.indices.contains(index + step) else { return }
+        chosen.swapAt(index, index + step)
+        widgets = chosen.map(\.rawValue).joined(separator: ",")
     }
 }
 

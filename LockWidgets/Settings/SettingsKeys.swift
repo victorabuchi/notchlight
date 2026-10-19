@@ -53,6 +53,8 @@ enum SettingsKey {
     /// The widgets Light shows, in order, as their names joined by commas.
     static let lightWidgets = "lightWidgets"
     static let lightNotes = "lightNotes"
+    /// Light's note is kept in Apple Notes too.
+    static let lightNotesSync = "lightNotesSync"
     /// "all" for every chosen widget side by side, or "music" for the song alone.
     static let lightShows = "lightShows"
     /// What a click on a live island opens: "light", or "app" for the app behind it.

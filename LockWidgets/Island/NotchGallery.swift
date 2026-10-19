@@ -23,6 +23,8 @@ enum NotchGallery {
         CalendarStore.shared.loadSample()
         RemindersStore.shared.loadSample()
         CountdownStore.shared.loadSample()
+        WeatherStore.shared.loadSample()
+        BatteryMonitor.shared.loadSample()
         let wall = UserDefaults.standard.string(forKey: "notchWall").flatMap { NSImage(contentsOfFile: $0) }
         try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         let notch = CGSize(width: 185, height: 32)
@@ -47,6 +49,10 @@ enum NotchGallery {
         }
 
         light("light") { $0.page = .light }
+        light("light-more") {
+            $0.page = .light
+            $0.widgets = [.music, .weather, .battery, .shortcuts, .todos]
+        }
         TrayStore.shared.loadSample([])
         light("tray-empty") { $0.page = .tray }
         let files = ["README.md", "project.yml", "docs/assets/og.jpg", "docs/index.html"].map { URL(fileURLWithPath: FileManager.default.currentDirectoryPath).appendingPathComponent($0) }
