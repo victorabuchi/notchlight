@@ -62,6 +62,8 @@ final class LightController {
         model.startSize = island.size == .zero ? island.notch : island.size
         model.isOpen = false
         panel?.hang(model.frameSize)
+        // The card it grew from closes behind it, so the island is closed when Light folds back.
+        island.isExpanded = false
         IslandController.shared.isSuppressed = true
         panel?.orderFrontRegardless()
         DispatchQueue.main.async { [model] in

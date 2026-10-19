@@ -109,8 +109,14 @@ struct IslandView: View {
         .animation(.spring(response: 0.3, dampingFraction: 0.8), value: status.privacy)
         .contentShape(Rectangle())
         .onTapGesture {
-            // Clicks on the closed island are handled by IslandController; a click on the open card,
-            // outside its buttons, opens the app behind it and closes the card, as on the iPhone.
+            // Clicks on the closed island are handled by IslandController. A click on the open card, outside
+            // its buttons, opens Light, or the app behind the card when that's chosen in Notch Settings.
+            if let primary = model.primary, !primary.isTransient, SettingsKey.isOn(SettingsKey.lightEnabled),
+               UserDefaults.standard.string(forKey: SettingsKey.islandClick) != "app"
+            {
+                LightController.shared.open()
+                return
+            }
             if let primary = model.primary { IslandActions.open(primary) }
             model.isExpanded = false
         }

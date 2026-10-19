@@ -225,6 +225,9 @@ final class NowPlayingStore: ObservableObject {
     /// again for a little while if Music hasn't cached the entry yet.
     private func loadCatalogueArtwork(for track: Track, attempt: Int) {
         guard let url = AppleMusicLyrics.artworkURL(title: track.title, duration: track.duration) else {
+            // Music caches a song's catalogue entry only with its lyrics, so songs without lyrics may never
+            // have one; Apple's catalogue search finds most of those.
+            if attempt == 0 { searchArtwork(for: track) }
             if attempt < 5 {
                 queue.asyncAfter(deadline: .now() + 2) { [weak self] in self?.loadCatalogueArtwork(for: track, attempt: attempt + 1) }
             }
@@ -233,6 +236,39 @@ final class NowPlayingStore: ObservableObject {
         URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
             guard let data, let image = NSImage(data: data) else { return }
             DispatchQueue.main.async { if self?.track?.id == track.id { self?.artwork = image } }
+        }.resume()
+    }
+}
+
+extension NowPlayingStore {
+    /// Looks a song up in Apple's public catalogue, matched by title, artist and length, for its artwork.
+    /// Only the song's title and artist are sent, to Apple.
+    fileprivate func searchArtwork(for track: Track) {
+        var components = URLComponents(string: "https://itunes.apple.com/search")!
+        components.queryItems = [
+            URLQueryItem(name: "term", value: "\(track.artist) \(track.title)"),
+            URLQueryItem(name: "entity", value: "song"),
+            URLQueryItem(name: "limit", value: "25"),
+            URLQueryItem(name: "country", value: Locale.current.region?.identifier ?? "US"),
+        ]
+        guard let url = components.url else { return }
+        let folded = { (text: String) in text.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: nil) }
+        URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
+            guard let data,
+                  let results = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])?["results"] as? [[String: Any]],
+                  let match = results.first(where: { result in
+                      let name = folded(result["trackName"] as? String ?? "")
+                      let length = (result["trackTimeMillis"] as? Double ?? 0) / 1000
+                      return (name == folded(track.title) || name.hasPrefix(folded(track.title) + " ("))
+                          && (track.duration == 0 || abs(length - track.duration) < 4)
+                  }),
+                  let small = match["artworkUrl100"] as? String,
+                  let large = URL(string: small.replacingOccurrences(of: "100x100bb", with: "600x600bb"))
+            else { return }
+            URLSession.shared.dataTask(with: large) { data, _, _ in
+                guard let data, let image = NSImage(data: data) else { return }
+                DispatchQueue.main.async { if self?.track?.id == track.id, self?.artwork == nil { self?.artwork = image } }
+            }.resume()
         }.resume()
     }
 }
