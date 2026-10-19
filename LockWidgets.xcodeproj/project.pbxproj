@@ -37,6 +37,7 @@
 		55BCB7E3172B68212EBE9797 /* WidgetGallery.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECCAE2E92BCBB1A729F1F6F3 /* WidgetGallery.swift */; };
 		576D5B2ABF3B13EF4189F685 /* StocksStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A513FE231239454ED6ED159 /* StocksStore.swift */; };
 		5A148EDD12571E5D5038FD64 /* SettingsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8314A5D52CFB7C8C3DC10023 /* SettingsKeys.swift */; };
+		5BEB228F6026502262486C9D /* LRCLib.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658E72AF7C492EAC584FF785 /* LRCLib.swift */; };
 		5C23A94A7D3DD81A4CB75614 /* AboutPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50667F8A2F064584A76D173F /* AboutPage.swift */; };
 		5DB39BA63B65E1585327A015 /* ClockWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 944261E2F34003592A329E1D /* ClockWidget.swift */; };
 		67D54EFF88C0DFAF14C606AC /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = CD0FB75D1A1B2C3527A1C0FA /* Sparkle */; };
@@ -121,6 +122,7 @@
 		5C7C55A83BA2DAD1F62FA6AE /* NewsWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsWidget.swift; sourceTree = "<group>"; };
 		5D7B8609BD101B905C97D79E /* NowPlayingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingStore.swift; sourceTree = "<group>"; };
 		62CEFE7F9ABFBC92793B4690 /* LayoutStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutStore.swift; sourceTree = "<group>"; };
+		658E72AF7C492EAC584FF785 /* LRCLib.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LRCLib.swift; sourceTree = "<group>"; };
 		6A3F2847FFAAC98340665AFC /* TravelIsland.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelIsland.swift; sourceTree = "<group>"; };
 		6E7B4AC3C487672B6DE67D62 /* ActivityTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTracker.swift; sourceTree = "<group>"; };
 		6EE72259ADB9B790E83CE79B /* BatteryWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryWidget.swift; sourceTree = "<group>"; };
@@ -262,6 +264,7 @@
 				CA65EB68D63BB068EC166544 /* DeviceMonitor.swift */,
 				406E0CD205C3061CF6EFE586 /* EarthStore.swift */,
 				3C7C6BDC2A9C99596CFCFE3F /* LicenseStore.swift */,
+				658E72AF7C492EAC584FF785 /* LRCLib.swift */,
 				EB0DD8D79FA0BF7238001897 /* LyricsStore.swift */,
 				51BC3ABA91FF75E22A9622A7 /* NewsStore.swift */,
 				C1232187C31444AB12322EDB /* NotificationStore.swift */,
@@ -439,6 +442,7 @@
 				E3A39614A198C8D439541BDD /* IslandModel.swift in Sources */,
 				9B80F13F498854FB48EEC10E /* IslandSettingsPage.swift in Sources */,
 				28459D33C3F154D9117CC8D8 /* IslandView.swift in Sources */,
+				5BEB228F6026502262486C9D /* LRCLib.swift in Sources */,
 				8EE9ADA9CB9906AF5DEE5112 /* LayoutGalleryPage.swift in Sources */,
 				C2C478E31A770DC83E86961D /* LayoutStore.swift in Sources */,
 				52690D0AE034DEDF3E3D8D2E /* LayoutStudioPage.swift in Sources */,

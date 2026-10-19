@@ -42,7 +42,7 @@ struct LyricsWidget: View {
         case .loading, .idle:
             WidgetPlaceholder(symbol: "ellipsis", message: "Getting lyrics from Apple Music…")
         case .unavailable:
-            WidgetPlaceholder(symbol: "quote.bubble", message: "Apple Music has no lyrics for this song.")
+            WidgetPlaceholder(symbol: "quote.bubble", message: "No synced lyrics for this song.")
         case .otherPlayer:
             WidgetPlaceholder(symbol: "music.note", message: "Lyrics come from Apple Music.")
         }

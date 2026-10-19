@@ -1,7 +1,8 @@
 import Combine
 import Foundation
 
-/// Apple Music's synced lyrics for the current track, timed against the playback position.
+/// Synced lyrics for the current track, timed against the playback position: Apple Music's own when Music
+/// has fetched them, otherwise LRCLIB's, which also covers Spotify and songs from a station or autoplay.
 final class LyricsStore: ObservableObject {
     static let shared = LyricsStore()
 
@@ -28,6 +29,8 @@ final class LyricsStore: ObservableObject {
     private var subscription: AnyCancellable?
     private var retry: Timer?
     private var cache: [String: [Line]] = [:]
+    /// LRCLIB's lines for the current song, while Apple Music's may still arrive.
+    private var fallback: Task<Void, Never>?
     private let queue = DispatchQueue(label: "LockWidgets.Lyrics")
 
     private init() {
@@ -52,14 +55,10 @@ final class LyricsStore: ObservableObject {
 
     private func load(_ track: NowPlayingStore.Track?) {
         retry?.invalidate()
+        fallback?.cancel()
         guard let track else {
             lines = []
             state = .idle
-            return
-        }
-        guard track.player == .music else {
-            lines = []
-            state = .otherPlayer
             return
         }
         let key = track.id
@@ -70,7 +69,36 @@ final class LyricsStore: ObservableObject {
         }
         lines = []
         state = .loading
+        guard track.player == .music else {
+            // Spotify has no Apple Music lyrics to wait for.
+            askLRCLib(track, key: key, finalAnswer: true)
+            return
+        }
         attempt(track, key: key, remaining: 10)
+    }
+
+    /// LRCLIB's lyrics, shown unless Apple Music's are already here. When it's the last source, no lyrics
+    /// means the song has none.
+    private func askLRCLib(_ track: NowPlayingStore.Track, key: String, finalAnswer: Bool) {
+        fallback = Task { [weak self] in
+            let found = await LRCLib.lyrics(for: track)
+            await MainActor.run {
+                guard let self, !Task.isCancelled, NowPlayingStore.shared.track?.id == key, self.state != .found else { return }
+                if let found {
+                    self.show(found, key: key, keep: false)
+                } else if finalAnswer {
+                    self.state = .unavailable
+                }
+            }
+        }
+    }
+
+    private func show(_ found: [AppleMusicLyrics.Line], key: String, keep: Bool) {
+        let lines = found.enumerated().map { Line(id: $0.offset, begin: $0.element.begin, end: $0.element.end, text: $0.element.text) }
+        // Apple Music's lines are kept for the song; LRCLIB's stay only until Apple's arrive.
+        if keep { cache[key] = lines }
+        self.lines = lines
+        state = .found
     }
 
     /// Music fetches lyrics a moment after a song starts, so look a few times before giving up.
@@ -80,15 +108,16 @@ final class LyricsStore: ObservableObject {
             DispatchQueue.main.async {
                 guard let self, NowPlayingStore.shared.track?.id == key else { return }
                 if let found {
-                    let lines = found.enumerated().map { Line(id: $0.offset, begin: $0.element.begin, end: $0.element.end, text: $0.element.text) }
-                    self.cache[key] = lines
-                    self.lines = lines
-                    self.state = .found
+                    // Apple Music's own lyrics win, even over LRCLIB's already showing.
+                    self.fallback?.cancel()
+                    self.show(found, key: key, keep: true)
                 } else if remaining > 0 {
+                    // After the first look, ask LRCLIB too, in case Music never fetches any.
+                    if remaining == 9 { self.askLRCLib(track, key: key, finalAnswer: false) }
                     self.retry = Timer.scheduledTimer(withTimeInterval: 2, repeats: false) { _ in
                         self.attempt(track, key: key, remaining: remaining - 1)
                     }
-                } else {
+                } else if self.state != .found {
                     self.state = .unavailable
                 }
             }
