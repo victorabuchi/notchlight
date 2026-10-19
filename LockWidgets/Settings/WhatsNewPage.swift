@@ -9,6 +9,19 @@ struct WhatsNewPage: View {
 
     private let releases = [
         Release(
+            version: "1.5",
+            summary: "Light: click the notch for your music, calendar, notes, timers and to-dos side by side, with a Tray for your files.",
+            items: [
+                ("lamp.desk.fill", "Light", "Click the notch, or swipe down on it, for your widgets side by side: the song, a mirror, your calendar, notes, timers and to-dos. Click one to open its app. Choose them and their order in Notch Settings."),
+                ("tray.fill", "The Tray and AirDrop", "Drag files to the notch to keep them in the Tray, ready to drag out again, or drop them on AirDrop."),
+                ("quote.bubble.fill", "Lyrics for more songs", "Apple Music's own synced lyrics, and LRCLIB's for songs Music hasn't fetched and for Spotify."),
+                ("hand.point.up.left.fill", "Gestures", "Swipe down on the island to open it, up to close it, and sideways to change songs."),
+                ("gearshape.2.fill", "Notch Settings", "Light, the Tray, gestures, Liquid Glass and live activities in their own window, and on the Notch page in Settings."),
+                ("hand.wave.fill", "Hello", "A welcome drops from the notch the first time you open Notchlight."),
+                ("photo.on.rectangle", "Photos and maps", "Pick one photo or a set in your own order for Photos, and Satellite or Hybrid maps for Location."),
+            ]
+        ),
+        Release(
             version: "1.4",
             summary: "Trips, to-dos and home time on the island, a new icon, and a 7-day free trial before you buy.",
             items: [

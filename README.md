@@ -4,11 +4,11 @@ Widgets on your Mac's lock screen and a Dynamic Island around the notch.
 
 Website: [notchlight.com](https://notchlight.com)
 
-Notchlight puts live widgets on your Mac's lock screen: the weather, your next meeting, the song playing with Apple Music's own synced lyrics, your notes, a live globe and more. Glance at your Mac without unlocking it. Arrange the widgets wherever you like in Layout Studio, start from a ready-made layout in the Gallery, and pick the look that suits your wallpaper.
+Notchlight puts live widgets on your Mac's lock screen: the weather, your next meeting, the song playing with its synced lyrics, your notes, a live globe and more. Glance at your Mac without unlocking it. Arrange the widgets wherever you like in Layout Studio, start from a ready-made layout in the Gallery, and pick the look that suits your wallpaper.
 
 It runs from the menu bar. When you lock your Mac, it draws your widgets in a layer above the lock screen using [SkyLightWindow](https://github.com/Lakr233/SkyLightWindow), and removes them when you sign back in.
 
-On a MacBook with a notch, Notchlight also turns the notch into a Dynamic Island, like the iPhone's: the song that's playing, your calls, notifications and system alerts, on the desktop and on the lock screen.
+On a MacBook with a notch, Notchlight also turns the notch into a Dynamic Island, like the iPhone's: the song that's playing, your calls, notifications and system alerts, on the desktop and on the lock screen. Click the notch for Light: your music, a mirror, calendar, notes, timers and to-dos side by side, and a Tray for files you drag to the notch.
 
 ## Features
 
@@ -16,7 +16,9 @@ On a MacBook with a notch, Notchlight also turns the notch into a Dynamic Island
 - **21 widgets** in Small, Medium, Wide, Ultra Wide and Large sizes, most with several styles
 - **Layout Studio**: drag widgets anywhere on a life-size preview of your lock screen, with a warning when one covers the system clock or login area
 - **Layout Gallery**: seven ready-made layouts to start from
-- **Apple Music lyrics**: Apple's own time-synced lyrics, line by line, exactly as Music shows them
+- **Light**: click or swipe down on the notch for the song, a camera mirror, your calendar, notes (kept in Apple Notes), timers, to-dos from Reminders, weather, battery or your Shortcuts, in the order you choose
+- **The Tray**: drag files to the notch to keep them close, or drop them on AirDrop
+- **Synced lyrics**: Apple Music's own time-synced lyrics when Music has them, otherwise LRCLIB's, in Apple Music and Spotify
 - **Appearance**: Glass, Frosted, Solid or Minimal cards, with adjustable corner radius
 - **Sticky Notes**: notes to yourself in five paper colours
 - **Menu bar controls**: hide widgets, preview them on the desktop, and run the Pomodoro and Stopwatch
@@ -34,7 +36,7 @@ On a MacBook with a notch, Notchlight also turns the notch into a Dynamic Island
 | Now Playing | Player, Artwork | Apple Music and Spotify |
 | Music Card | Glass, shown only while a song plays | Apple Music and Spotify |
 | Photos | Photo, Framed | Photos library or a folder |
-| Live Lyrics | Lyrics | Apple Music, from Music on your Mac |
+| Live Lyrics | Lyrics | Apple Music, from Music on your Mac, or LRCLIB |
 | Calendar | Date, Monthly, Up Next | Your calendars |
 | Clock | Digital, Analog, World Clock | System time |
 | Countdown | Days, Flip | A date you choose |
@@ -97,11 +99,11 @@ Notchlight asks only when a widget needs something:
 
 ## Privacy
 
-Notchlight collects no data. Weather, news and prices come straight from their public sources. Lyrics are read from Apple Music on your Mac: when Music plays a song it fetches the song's lyrics from Apple, and Notchlight reads Music's local copy. For a streamed song without artwork in your library, the artwork is downloaded from Apple using the link in that same copy. Notifications are read from macOS's own notification database on your Mac and never leave it. Recent Activity notes which app is in front to add up today's time, and keeps that in a file on your Mac. Nothing is sent anywhere else. The full policy is at [notchlight.com/privacy](https://notchlight.com/privacy/).
+Notchlight collects no data. Weather, news and prices come straight from their public sources. Lyrics are read from Apple Music on your Mac: when Music fetches a song's lyrics from Apple, Notchlight reads Music's local copy. For other songs and for Spotify, synced lyrics come from LRCLIB (lrclib.net), which receives the song's title, artist, album and length. A streamed song's artwork comes from Apple, by the link in Music's copy or from Apple's iTunes Search. Light's note is also kept in Apple Notes, and the Mirror shows the camera only while it's on. Notifications are read from macOS's own notification database on your Mac and never leave it. Recent Activity notes which app is in front to add up today's time, and keeps that in a file on your Mac. Nothing is sent anywhere else. The full policy is at [notchlight.com/privacy](https://notchlight.com/privacy/).
 
 ## How lyrics work
 
-Apple doesn't offer Apple Music lyrics to other apps. Music does keep the lyrics it downloads, Apple's time-synced TTML, in its cache at `~/Library/Caches/com.apple.Music`. Notchlight finds the entry for the playing song by title and length and highlights each line at Apple's timestamps against Music's playback position. If Music has no lyrics for a song, the widget says so. Spotify tracks show Now Playing but no lyrics.
+Apple doesn't offer Apple Music lyrics to other apps. Music does keep the lyrics it downloads, Apple's time-synced TTML, in its cache at `~/Library/Caches/com.apple.Music`. Notchlight finds the entry for the playing song by title and length and highlights each line at Apple's timestamps against Music's playback position. Music fetches a song's lyrics when it shows them, so Notchlight looks again whenever Music's cache changes. Until then, and for Spotify, it asks LRCLIB for synced lyrics. If neither has any, the widget says so.
 
 ## Development
 
