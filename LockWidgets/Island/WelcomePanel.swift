@@ -2,9 +2,10 @@ import AppKit
 import Combine
 import SwiftUI
 
-/// The welcome that drops from the notch the first time Notchlight opens, the way a new Mac greets you: "hello"
-/// writes itself, then the ways to begin (buy, activate a licence or start the free trial). A second page shows
-/// what to try first. It can be opened again from the menu's Help & Support and from the Licence page.
+/// The welcome that drops from the notch the first time Notchlight opens, the way a new Mac greets you. It is
+/// one island in two steps: a short drop where "hello" writes itself, then it grows once into the welcome with
+/// the ways to begin (buy, activate a licence or start the free trial). A second page shows what to try first.
+/// It can be opened again from the menu's Help & Support and from the Licence page.
 final class WelcomeController {
     static let shared = WelcomeController()
 
@@ -39,6 +40,7 @@ final class WelcomeController {
 
     func show() {
         let island = IslandModel.shared
+        LightController.shared.close()
         if panel == nil { makePanel() }
         generation += 1
         let current = generation
@@ -47,19 +49,24 @@ final class WelcomeController {
         model.isOpen = false
         model.helloProgress = 0
         model.showsText = false
-        place(model.size(for: .welcome))
+        // One island at the notch: the live one steps aside while the welcome is out.
+        IslandController.shared.isSuppressed = true
+        place(model.helloSize)
         panel?.orderFrontRegardless()
 
         let still = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
         after(0.05, current) { [model] in
-            withAnimation(.spring(response: 0.55, dampingFraction: 0.8)) { model.isOpen = true }
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) { model.isOpen = true }
         }
+        let written = still ? 0.4 : 2.8
         if still {
             model.helloProgress = 1
-            after(0.3, current) { [model] in withAnimation(.easeOut(duration: 0.4)) { model.showsText = true } }
         } else {
-            after(0.5, current) { [model] in withAnimation(.timingCurve(0.45, 0, 0.35, 1, duration: 2.3)) { model.helloProgress = 1 } }
-            after(2.8, current) { [model] in withAnimation(.spring(response: 0.6, dampingFraction: 0.86)) { model.showsText = true } }
+            after(0.45, current) { [model] in withAnimation(.timingCurve(0.45, 0, 0.35, 1, duration: 2.2)) { model.helloProgress = 1 } }
+        }
+        after(written, current) { [weak self, model] in
+            self?.place(model.size(for: .welcome))
+            withAnimation(.spring(response: 0.55, dampingFraction: 0.84)) { model.showsText = true }
         }
     }
 
@@ -72,6 +79,7 @@ final class WelcomeController {
         withAnimation(.spring(response: 0.42, dampingFraction: 0.9)) { model.isOpen = false }
         after(0.45, current) { [weak self] in
             self?.panel?.orderOut(nil)
+            IslandController.shared.isSuppressed = false
             next?()
         }
     }
@@ -95,33 +103,39 @@ final class WelcomeController {
     }
 
     private func makePanel() {
-        let panel = NSPanel(
-            contentRect: NSRect(origin: .zero, size: model.size(for: .welcome)),
-            styleMask: [.borderless, .nonactivatingPanel],
-            backing: .buffered,
-            defer: false
-        )
-        panel.isOpaque = false
-        panel.backgroundColor = .clear
-        panel.hasShadow = false
-        // Above the island, which it grows out of.
-        panel.level = .statusBar + 9
-        panel.collectionBehavior = [.canJoinAllSpaces, .stationary, .fullScreenAuxiliary, .ignoresCycle]
-        panel.isMovable = false
-        panel.contentView = FirstClickView(rootView: WelcomeView(model: model))
+        let panel = NSPanel.atNotch(level: .statusBar + 9)
+        panel.contentView = NotchHostingView(rootView: WelcomeView(model: model))
         self.panel = panel
     }
 
-    /// Hangs the panel from the top of the screen, centred on the notch.
     private func place(_ size: CGSize) {
-        guard let panel, let screen = IslandModel.screen else { return }
-        let frame = screen.frame
-        panel.setFrame(NSRect(x: frame.midX - size.width / 2, y: frame.maxY - size.height, width: size.width, height: size.height), display: true)
+        panel?.hang(size)
     }
 }
 
-/// Buttons in the welcome work on the first click, while another app is in front.
-private final class FirstClickView<Content: View>: NSHostingView<Content> {
+extension NSPanel {
+    /// A clear, borderless panel for shapes that hang from the notch, on every Space and over full-screen apps.
+    static func atNotch(level: NSWindow.Level) -> NSPanel {
+        let panel = NSPanel(contentRect: NSRect(x: 0, y: 0, width: 200, height: 40), styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
+        panel.isOpaque = false
+        panel.backgroundColor = .clear
+        panel.hasShadow = false
+        panel.level = level
+        panel.collectionBehavior = [.canJoinAllSpaces, .stationary, .fullScreenAuxiliary, .ignoresCycle]
+        panel.isMovable = false
+        return panel
+    }
+
+    /// Hangs the panel from the top of the screen, centred on the notch.
+    func hang(_ size: CGSize) {
+        guard let screen = IslandModel.screen else { return }
+        let frame = screen.frame
+        setFrame(NSRect(x: frame.midX - size.width / 2, y: frame.maxY - size.height, width: size.width, height: size.height), display: true)
+    }
+}
+
+/// Buttons on the notch work on the first click, while another app is in front.
+final class NotchHostingView<Content: View>: NSHostingView<Content> {
     override func acceptsFirstMouse(for _: NSEvent?) -> Bool { true }
 }
 
@@ -133,7 +147,7 @@ final class WelcomeModel: ObservableObject {
     @Published var isOpen = false
     /// How much of "hello" is written.
     @Published var helloProgress: CGFloat = 0
-    /// The words and buttons under "hello", which arrive once it's written.
+    /// The welcome under "hello", which the island grows to show once "hello" is written.
     @Published var showsText = false
     @Published var licence: LicenseStore.State = .trial(daysLeft: LicenseStore.trialDays)
     var notch = CGSize(width: 200, height: 32)
@@ -144,14 +158,20 @@ final class WelcomeModel: ObservableObject {
     var onWebsite: () -> Void = {}
     var onPage: (Page) -> Void = { _ in }
 
+    /// The first, short drop, just big enough for "hello".
+    var helloSize: CGSize { CGSize(width: 320, height: notch.height + 104) }
+
     func size(for page: Page) -> CGSize {
         switch page {
-        case .welcome: CGSize(width: 440, height: notch.height + 334)
-        case .tutorial: CGSize(width: 800, height: notch.height + 238)
+        case .welcome: CGSize(width: 380, height: notch.height + (licence == .licensed ? 206 : 246))
+        case .tutorial: CGSize(width: 740, height: notch.height + 214)
         }
     }
 
-    var size: CGSize { isOpen ? size(for: page) : notch }
+    var size: CGSize {
+        guard isOpen else { return notch }
+        return page == .welcome && !showsText ? helloSize : size(for: page)
+    }
 }
 
 struct WelcomeView: View {
@@ -160,7 +180,7 @@ struct WelcomeView: View {
     var body: some View {
         let size = model.size
         ZStack(alignment: .top) {
-            IslandShape(bottomRadius: model.isOpen ? 34 : IslandModel.notchRadius)
+            IslandShape(bottomRadius: model.isOpen ? 28 : IslandModel.notchRadius)
                 .fill(Color.black)
             VStack(spacing: 0) {
                 // The camera.
@@ -174,7 +194,7 @@ struct WelcomeView: View {
             .opacity(model.isOpen ? 1 : 0)
         }
         .frame(width: size.width, height: size.height, alignment: .top)
-        .clipShape(IslandShape(bottomRadius: model.isOpen ? 34 : IslandModel.notchRadius))
+        .clipShape(IslandShape(bottomRadius: model.isOpen ? 28 : IslandModel.notchRadius))
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .foregroundStyle(.white)
         .environment(\.colorScheme, .dark)
@@ -184,34 +204,38 @@ struct WelcomeView: View {
 
     private var welcome: some View {
         VStack(spacing: 0) {
+            // Written in the middle of the short drop, then smaller at the top of the welcome.
             HelloShape()
                 .trim(from: 0, to: model.helloProgress)
-                .stroke(Color.white, style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
-                .frame(width: 176, height: 72)
-                // Written large in the middle, then it settles at the top as the welcome arrives.
-                .scaleEffect(model.showsText ? 1 : 1.3)
-                .offset(y: model.showsText ? 0 : 92)
-                .padding(.top, 16)
-                .padding(.bottom, 12)
+                .stroke(Color.white, style: StrokeStyle(lineWidth: model.showsText ? 3.2 : 3.8, lineCap: .round, lineJoin: .round))
+                .frame(width: model.showsText ? 120 : 164, height: model.showsText ? 48 : 66)
+                .padding(.top, model.showsText ? 6 : 16)
+                .padding(.bottom, 8)
 
             VStack(spacing: 0) {
                 Text("Welcome to Notchlight!")
-                    .font(.system(size: 16, weight: .medium))
+                    .font(.system(size: 15, weight: .semibold))
                 Text(subtitle)
-                    .font(.system(size: 14))
-                    .foregroundStyle(.white.opacity(0.72))
+                    .font(.system(size: 13))
+                    .foregroundStyle(.white.opacity(0.7))
                     .multilineTextAlignment(.center)
-                    .padding(.top, 4)
+                    .padding(.top, 3)
 
-                Button(action: model.licence == .licensed ? model.onStart : model.onBuy) {
-                    Label(model.licence == .licensed ? "Get Started" : "Buy Notchlight", systemImage: model.licence == .licensed ? "arrow.right" : "arrow.up.right")
-                        .frame(width: 236)
-                }
-                .buttonStyle(WelcomeButtonStyle(prominent: true))
-                .padding(.top, 18)
+                if model.licence == .licensed {
+                    Button(action: model.onStart) {
+                        Label("Get Started", systemImage: "arrow.right")
+                    }
+                    .buttonStyle(WelcomeButtonStyle(prominent: true))
+                    .padding(.top, 14)
+                } else {
+                    Button(action: model.onBuy) {
+                        Label("Buy Notchlight", systemImage: "arrow.up.right")
+                            .frame(width: 196)
+                    }
+                    .buttonStyle(WelcomeButtonStyle(prominent: true))
+                    .padding(.top, 14)
 
-                if model.licence != .licensed {
-                    HStack(spacing: 10) {
+                    HStack(spacing: 8) {
                         Button(action: model.onActivate) {
                             Label("Activate Licence", systemImage: "key.horizontal")
                         }
@@ -222,18 +246,17 @@ struct WelcomeView: View {
                         }
                     }
                     .buttonStyle(WelcomeButtonStyle(prominent: false))
-                    .padding(.top, 12)
+                    .padding(.top, 9)
                 }
 
                 Button("See Tutorial") { model.onPage(.tutorial) }
-                    .buttonStyle(WelcomeLinkStyle())
-                    .padding(.top, 16)
-                Button("notchlight.com", action: model.onWebsite)
                     .buttonStyle(WelcomeLinkStyle(size: 13))
-                    .padding(.top, 10)
+                    .padding(.top, 13)
+                Button("notchlight.com", action: model.onWebsite)
+                    .buttonStyle(WelcomeLinkStyle(size: 12))
+                    .padding(.top, 7)
             }
             .opacity(model.showsText ? 1 : 0)
-            .offset(y: model.showsText ? 0 : 10)
         }
     }
 
@@ -248,8 +271,8 @@ struct WelcomeView: View {
 
     private static let tips: [(symbol: String, text: String)] = [
         ("cursorarrow.rays", "Point at the island for the song, its lyrics and controls."),
-        ("cursorarrow.click.2", "Click the island to open the app behind it."),
-        ("lock.display", "Press ⌃⌘Q to lock your Mac and see your widgets."),
+        ("cursorarrow.click.2", "Click the notch to open Light: your music, a mirror and the Tray."),
+        ("lock.laptopcomputer", "Press ⌃⌘Q to lock your Mac and see your widgets."),
         ("rectangle.3.group", "Arrange your widgets in Layout Studio, from the menu bar."),
     ]
 
@@ -257,27 +280,27 @@ struct WelcomeView: View {
         VStack(spacing: 0) {
             HStack(alignment: .top, spacing: 0) {
                 ForEach(Self.tips, id: \.symbol) { tip in
-                    VStack(spacing: 16) {
+                    VStack(spacing: 14) {
                         Image(systemName: tip.symbol)
-                            .font(.system(size: 46, weight: .ultraLight))
-                            .frame(height: 58)
+                            .font(.system(size: 40, weight: .ultraLight))
+                            .frame(height: 52)
                         Text(tip.text)
-                            .font(.system(size: 14))
+                            .font(.system(size: 13))
                             .multilineTextAlignment(.center)
                             .fixedSize(horizontal: false, vertical: true)
-                            .frame(width: 164)
+                            .frame(width: 150)
                     }
                     .frame(maxWidth: .infinity)
                 }
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 28)
+            .padding(.horizontal, 18)
+            .padding(.top, 22)
 
-            HStack(spacing: 14) {
+            HStack(spacing: 12) {
                 Button { model.onPage(.welcome) } label: {
                     Label("Back to Welcome", systemImage: "chevron.left")
                 }
-                .buttonStyle(WelcomeLinkStyle(size: 14))
+                .buttonStyle(WelcomeLinkStyle(size: 13))
                 if model.licence == .licensed {
                     Button(action: model.onStart) { Label("Get Started", systemImage: "arrow.right") }
                         .buttonStyle(WelcomeButtonStyle(prominent: true))
@@ -292,7 +315,7 @@ struct WelcomeView: View {
                     }
                 }
             }
-            .padding(.top, 26)
+            .padding(.top, 22)
         }
     }
 }
@@ -303,15 +326,15 @@ private struct WelcomeButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: prominent ? 15 : 14, weight: .medium))
+            .font(.system(size: 13, weight: .medium))
             .foregroundStyle(.white)
-            .padding(.horizontal, prominent ? 20 : 14)
-            .frame(height: prominent ? 38 : 32)
+            .padding(.horizontal, prominent ? 16 : 12)
+            .frame(height: prominent ? 30 : 28)
             .background {
                 if prominent {
                     Capsule().fill(Color(red: 0.25, green: 0.55, blue: 1))
                 } else {
-                    RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.white.opacity(0.14))
+                    RoundedRectangle(cornerRadius: 7, style: .continuous).fill(Color.white.opacity(0.14))
                 }
             }
             .contentShape(Rectangle())
@@ -321,7 +344,7 @@ private struct WelcomeButtonStyle: ButtonStyle {
 
 /// Grey words that work as links.
 private struct WelcomeLinkStyle: ButtonStyle {
-    var size: CGFloat = 14
+    var size: CGFloat = 13
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
