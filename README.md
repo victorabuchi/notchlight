@@ -58,6 +58,9 @@ With nothing going on, the island is exactly your notch. When something is live,
 | Calls and meetings | Call icon and time | App, mic and camera, Zoom controls |
 | Personal Hotspot | Hotspot icon | The iPhone you're connected to |
 | Pomodoro and Stopwatch | Timer and time left | Pause and skip or reset |
+| Trips | Bus, train or plane and the time left | Where to, when you arrive and the journey so far |
+| To-dos | Reminders due today, in the circle | The next three |
+| Home time | In another time zone, home's time in the circle | Here and home, and the difference |
 
 Notifications from every app, upcoming events, charging, low battery, AirPods and other Bluetooth devices, volume, brightness and Focus drop down from the notch for a few seconds.
 
@@ -75,6 +78,8 @@ Or install it with [Homebrew](https://brew.sh):
 ```sh
 brew install --cask victorabuchi/tap/notchlight
 ```
+
+Notchlight is free for 7 days. After that, a licence is $14.99, paid once, for up to 3 of your Macs: buy it at [notchlight.com](https://notchlight.com) and enter the key in **Settings → Licence**.
 
 Requires macOS 15 or later. Builds are signed with a Developer ID and notarized by Apple. Notchlight checks for updates once a day and asks before installing one; choose **Check for Updates…** in its menu to look now.
 

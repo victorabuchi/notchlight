@@ -9,6 +9,18 @@ struct WhatsNewPage: View {
 
     private let releases = [
         Release(
+            version: "1.4",
+            summary: "Trips, to-dos and home time on the island, a new icon, and a 7-day free trial before you buy.",
+            items: [
+                ("key.fill", "Try it, then buy it once", "Everything is free for 7 days. A licence is one payment, with no subscription, for up to 3 of your Macs. Enter yours in Settings, under Licence."),
+                ("bus.fill", "Trips", "A bus, train or flight from your calendar, or one you start from the menu bar: the time it leaves, then the time left on a blue line, as Maps shows a journey on the iPhone."),
+                ("checklist", "To-dos", "Reminders due today wait in the circle beside the notch. Point at it to see them."),
+                ("house.fill", "Home time", "In another time zone, the time back home waits in the circle, after a moment saying how far you are from home."),
+                ("personalhotspot", "A calmer island", "The hotspot on its own sits in the circle, with the microphone, camera or recording dot beside it, and brightness shows only when you change it."),
+                ("app.fill", "A new icon", "A framed screen with the notch, on Apple blue, with Dark, Clear and Tinted versions."),
+            ]
+        ),
+        Release(
             version: "1.3",
             summary: "LockWidgets is now Notchlight, with a new icon, automatic updates and four new widgets.",
             items: [

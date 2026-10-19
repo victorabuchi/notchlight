@@ -49,8 +49,8 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.victorabuchi.LockWidgets
         PRODUCT_NAME: Notchlight
-        MARKETING_VERSION: "1.3"
-        CURRENT_PROJECT_VERSION: "4"
+        MARKETING_VERSION: "1.4"
+        CURRENT_PROJECT_VERSION: "5"
         SWIFT_VERSION: "5.0"
         CODE_SIGN_STYLE: Automatic
         CODE_SIGN_IDENTITY: Apple Development
