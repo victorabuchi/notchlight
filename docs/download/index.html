@@ -119,6 +119,8 @@ footer a { color: var(--muted); }
   .trial { padding: 28px; }
 }
 </style>
+<!-- Statiku counts visits without cookies; the privacy page says what it sees. -->
+<script defer data-project="p_gzwvd7x7ta" src="https://statiku-ingest.onrender.com/s.js"></script>
 </head>
 <body>
 <header class="bar">
@@ -220,7 +222,10 @@ footer a { color: var(--muted); }
     return;
   }
   const link = document.getElementById("again");
-  setTimeout(() => { window.location.href = link.href; }, 700);
+  // The file comes from GitHub, so the page tells Statiku about the download it starts. Called before the script has
+  // loaded, it waits in a queue.
+  window.statiku = window.statiku || function () { (statiku.q = statiku.q || []).push(arguments) };
+  setTimeout(() => { statiku("download", { props: { file: "Notchlight.dmg" } }); window.location.href = link.href; }, 700);
 })();
 </script>
 </body>
